@@ -235,7 +235,7 @@ const DemoApp = {
 
   // actions
   sendData(data) {
-    Telegram.WebApp.sendData(data);
+    Telegram.WebApp.sendData(JSON.stringify(data));
   },
 
   sendMessage(msg_id, with_webview) {
