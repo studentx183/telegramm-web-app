@@ -1,0 +1,49 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.main {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+form select,
+form input,
+form textarea,
+form button {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  outline: none;
+  border: 1px solid #299b9b;
+  margin-bottom: 10px;
+  background-color: #fff;
+  color: #000;
+}
+
+form button,
+form select {
+  cursor: pointer;
+}
+
+form button:hover {
+  background-color: #299b9b;
+  color: #fff;
+}
+
+@media (pointer: coarse) {
+  form button {
+    background-color: #299b9b;
+    color: #fff;
+  }
+  
+  form button:active,
+  form button:focus {
+    background-color: #fff;
+    color: #000;
+  }
+}
