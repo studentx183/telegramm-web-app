@@ -2,6 +2,9 @@ let selectedLocation = null;
 
 const onClickSubmitBtn = () => {
   const submitBtn = document.getElementById("submit-btn");
+  if (!validatePhone() || !validateInn()) {
+    return;
+  }
   if (!submitBtn) {
     alert("Заполните все поля");
     return;
@@ -10,6 +13,27 @@ const onClickSubmitBtn = () => {
     return;
   }
   submitBtn.click();
+};
+
+const validatePhone = () => {
+  if (phoneInput.value.length < 19) {
+    phoneInput.setCustomValidity("Введите корректный номер телефона");
+    return false;
+  } else {
+    phoneInput.setCustomValidity("");
+    return true;
+  }
+};
+
+const validateInn = () => {
+  const innInput = document.getElementById("inn-input");
+  if (innInput.value.length < 10) {
+    innInput.setCustomValidity("Введите корректный ИНН");
+    return false;
+  } else {
+    innInput.setCustomValidity("");
+    return true;
+  }
 };
 
 const initYandexMap = () => {
@@ -129,6 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
     removeElementsById([
       "region",
       "city",
+      "territory",
       "inputs",
       "format",
       "category",
@@ -150,6 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const handleRegionChange = (event) => {
     removeElementsById([
       "city",
+      "territory",
       "inputs",
       "format",
       "category",
@@ -163,8 +189,31 @@ document.addEventListener("DOMContentLoaded", () => {
       data.regions[selectedRegion],
       "Shaharni tanlang"
     );
-    citySelect.addEventListener("change", handleCityChange);
+    citySelect.addEventListener("change", handleTerritoryChange);
     formContent.appendChild(citySelect);
+  };
+
+  const handleTerritoryChange = () => {
+    removeElementsById([
+      "territory",
+      "inputs",
+      "format",
+      "category",
+      "channel",
+      "type",
+      "map",
+    ]);
+    const formatSelect = createSelectElement(
+      "territory",
+      {
+        format1: "Territory 1",
+        format2: "Territory 2",
+        format3: "Territory 3",
+      },
+      "Territoryni tanlang"
+    );
+    formatSelect.addEventListener("change", handleCityChange);
+    formContent.appendChild(formatSelect);
   };
 
   // Function to handle city selection
@@ -232,12 +281,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const inputsDiv = document.createElement("div");
     inputsDiv.id = "inputs";
     inputsDiv.innerHTML = `
-      <input type="text" required name="name" class="text-input" placeholder="name" />
-      <input type="text" required name="surname" class="text-input" placeholder="surname" />
-      <input type="text" required name="phone" id="phone-input" class="text-input" placeholder="phone" />
-      <input type="text" required name="inn" id="inn-input" class="text-input" placeholder="inn" />
+      <input type="text" required name="name" class="text-input" placeholder="Названия магазина" />
+      <input type="text" required name="legal_name" class="text-input" placeholder="Юридическое название" />
+      <input type="text" required name="phone" id="phone-input" class="text-input" placeholder="Телефон" />
+      <input type="text" required name="inn" id="inn-input" class="text-input" placeholder="Инн" />
+      <input type="text" required name="address" id="address-input" class="text-input" placeholder="Адрес" />
+      <input type="text" required name="reference_point" id="reference-input" class="text-input" placeholder="Ориентир" />
       <div id="map"></div>
-      <button style="visibility: hidden" type="submit" name="submit" id="submit-btn">Saqlash</button>`;
+      <button style="visibility: visible" type="submit" name="submit" id="submit-btn">Saqlash</button>`;
     formContent.appendChild(inputsDiv);
 
     // init yandex-maps
