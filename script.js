@@ -1,3 +1,55 @@
+const selectedLocation = null;
+
+const onClickSubmitBtn = () => {
+  const submitBtn = document.getElementById("submit-btn");
+  if (!submitBtn) {
+    alert("Заполните все поля");
+    return;
+  } else if (!selectedLocation) {
+    alert("Выберите местоположение на карте");
+    return;
+  }
+  submitBtn.click();
+};
+
+const initYandexMap = () => {
+  Telegram.WebApp.ready();
+
+  const userCoords = DemoApp.requestLocation() || {
+    latitude: 41.2995,
+    longitude: 69.2401,
+  };
+
+  ymaps.ready(init);
+
+  function init() {
+    var map = new ymaps.Map("map", {
+      center: [userCoords?.latitude, userCoords?.longitude],
+      zoom: 10,
+    });
+
+    var placemark;
+
+    map.events.add("click", function (e) {
+      var coords = e.get("coords");
+
+      if (placemark) {
+        placemark.geometry.setCoordinates(coords);
+      } else {
+        placemark = new ymaps.Placemark(
+          coords,
+          {},
+          {
+            draggable: true,
+          }
+        );
+        map.geoObjects.add(placemark);
+      }
+      selectedLocation = coords;
+    });
+  }
+};
+
 document.addEventListener("DOMContentLoaded", () => {
   const formContent = document.getElementById("addForm");
 
@@ -82,6 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "category",
       "channel",
       "type",
+      "map",
     ]);
     const selectedZone = event.target.value;
     const regionSelect = createSelectElement(
@@ -102,6 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "category",
       "channel",
       "type",
+      "map",
     ]);
     const selectedRegion = event.target.value;
     const citySelect = createSelectElement(
@@ -115,7 +169,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Function to handle city selection
   const handleCityChange = () => {
-    removeElementsById(["inputs", "format", "category", "channel", "type"]);
+    removeElementsById([
+      "inputs",
+      "format",
+      "category",
+      "channel",
+      "type",
+      "map",
+    ]);
     const formatSelect = createSelectElement(
       "format",
       { format1: "Format 1", format2: "Format 2", format3: "Format 3" },
@@ -127,7 +188,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Function to handle format selection
   const handleFormatChange = () => {
-    removeElementsById(["inputs", "category", "channel", "type"]);
+    removeElementsById(["inputs", "category", "channel", "type", "map"]);
     const categorySelect = createSelectElement(
       "category",
       {
@@ -143,7 +204,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Function to handle category selection
   const handleCategoryChange = () => {
-    removeElementsById(["inputs", "channel", "type"]);
+    removeElementsById(["inputs", "channel", "type", "map"]);
     const channelSelect = createSelectElement(
       "channel",
       { channel1: "Channel 1", channel2: "Channel 2", channel3: "Channel 3" },
@@ -155,7 +216,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Function to handle channel selection
   const handleChannelChange = () => {
-    removeElementsById(["inputs", "type"]);
+    removeElementsById(["inputs", "type", "map"]);
     const typeSelect = createSelectElement(
       "type",
       { type1: "Type 1", type2: "Type 2", type3: "Type 3" },
@@ -175,8 +236,12 @@ document.addEventListener("DOMContentLoaded", () => {
       <input type="text" required name="surname" class="text-input" placeholder="surname" />
       <input type="text" required name="phone" id="phone-input" class="text-input" placeholder="phone" />
       <input type="text" required name="inn" id="inn-input" class="text-input" placeholder="inn" />
+      <div id="map"></div>
       <button style="visibility: hidden" type="submit" name="submit" id="submit-btn">Saqlash</button>`;
     formContent.appendChild(inputsDiv);
+
+    // init yandex-maps
+    initYandexMap();
 
     // Apply input masks
     IMask(document.getElementById("phone-input"), {
@@ -192,66 +257,13 @@ document.addEventListener("DOMContentLoaded", () => {
     formData.forEach((value, key) => {
       data[key] = value;
     });
-    DemoApp.sendData(data);
+    DemoApp.sendData();
+    DemoApp.close();
   });
 
   // Initial event listener for the 'zone' select element
   document.getElementById("zone").addEventListener("change", handleZoneChange);
-
-  initYandexMap();
 });
-
-const onClickSubmitBtn = () => {
-  const submitBtn = document.getElementById("submit-btn");
-  if (!submitBtn) {
-    alert("Заполните все поля");
-    return;
-  }
-  submitBtn.click();
-};
-
-const initYandexMap = () => {
-  Telegram.WebApp.ready();
-
-  const userCoords = DemoApp.requestLocation() || {
-    latitude: 41.2995,
-    longitude: 69.2401,
-  };
-
-  ymaps.ready(init);
-
-  function init() {
-    var map = new ymaps.Map("map", {
-      center: [userCoords.latitude, userCoords.longitude],
-      zoom: 15,
-    });
-
-    // Place initial marker at user's coordinates
-    var placemark = new ymaps.Placemark(
-      [userCoords.latitude, userCoords.longitude],
-      {},
-      {
-        draggable: true,
-      }
-    );
-    map.geoObjects.add(placemark);
-
-    // Update marker position on map click
-    map.events.add("click", function (e) {
-      var coords = e.get("coords");
-
-      placemark.geometry.setCoordinates(coords);
-
-      // Send the location data back to Telegram
-      Telegram.WebApp.sendData(
-        JSON.stringify({
-          latitude: coords[0],
-          longitude: coords[1],
-        })
-      );
-    });
-  }
-};
 
 const DemoApp = {
   initData: Telegram.WebApp.initData || "",
@@ -277,8 +289,14 @@ const DemoApp = {
   },
 
   // actions
-  sendData(data) {
-    Telegram.WebApp.sendData(JSON.stringify(data));
+  sendData() {
+    // Telegram.WebApp.sendData(JSON.stringify(data));
+    Telegram.WebApp.sendData(
+      JSON.stringify({
+        action: "form_submission",
+        message: "Form submitted successfully!",
+      })
+    );
   },
 
   sendMessage(msg_id, with_webview) {
@@ -353,7 +371,6 @@ const DemoApp = {
   requestLocation() {
     if (navigator.geolocation) {
       return navigator.geolocation.getCurrentPosition((position) => {
-        console.log(position, "position");
         return position.coords;
       });
     }
