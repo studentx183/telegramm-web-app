@@ -285,6 +285,7 @@ const DemoApp = {
       }
     );
   },
+
   changeMenuButton(close) {
     document.querySelectorAll("button").forEach((btn) => (btn.disabled = true));
     const btnStatus = document.querySelector("#btn_status");
@@ -575,3 +576,5 @@ const DemoApp = {
       });
   },
 };
+
+DemoApp.init();
