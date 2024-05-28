@@ -237,7 +237,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <input type="text" required name="phone" id="phone-input" class="text-input" placeholder="phone" />
       <input type="text" required name="inn" id="inn-input" class="text-input" placeholder="inn" />
       <div id="map"></div>
-      <button style="visibility: hidden" type="submit" name="submit" id="submit-btn">Saqlash</button>`;
+      <button style="visibility: visible" type="submit" name="submit" id="submit-btn">Saqlash</button>`;
     formContent.appendChild(inputsDiv);
 
     // init yandex-maps
@@ -258,7 +258,7 @@ document.addEventListener("DOMContentLoaded", () => {
       data[key] = value;
     });
     // DemoApp.sendData();
-    DemoApp.sendNotification("success");
+    DemoApp.sendNotification("Operation successful!");
     DemoApp.close();
   });
 
@@ -300,8 +300,8 @@ const DemoApp = {
     );
   },
 
-  sendNotification(type) {
-    Telegram.WebApp.notificationOccurred(type);
+  sendNotification(message) {
+    Telegram.WebApp.showAlert(message);
   },
 
   sendMessage(msg_id, with_webview) {
