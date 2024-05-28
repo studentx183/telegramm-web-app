@@ -1,11 +1,11 @@
 let selectedLocation = null;
 
 const onClickSubmitBtn = () => {
+  const submitBtn = document.getElementById("submit-btn");
   submitBtn.click();
 };
 
 const isValidForm = () => {
-  const submitBtn = document.getElementById("submit-btn");
   if (!validatePhone() || !validateInn()) {
     return false;
   }
