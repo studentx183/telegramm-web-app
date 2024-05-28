@@ -257,7 +257,8 @@ document.addEventListener("DOMContentLoaded", () => {
     formData.forEach((value, key) => {
       data[key] = value;
     });
-    DemoApp.sendData();
+    // DemoApp.sendData();
+    DemoApp.sendNotification("success");
     DemoApp.close();
   });
 
@@ -297,6 +298,10 @@ const DemoApp = {
         message: "Form submitted successfully!",
       })
     );
+  },
+
+  sendNotification(type) {
+    Telegram.WebApp.notificationOccurred(type);
   },
 
   sendMessage(msg_id, with_webview) {
