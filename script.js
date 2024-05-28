@@ -1,22 +1,28 @@
 let selectedLocation = null;
 
 const onClickSubmitBtn = () => {
-  const submitBtn = document.getElementById("submit-btn");
-  if (!validatePhone() || !validateInn()) {
-    return;
-  }
-  if (!submitBtn) {
-    alert("Заполните все поля");
-    return;
-  } else if (!selectedLocation) {
-    alert("Выберите местоположение на карте");
-    return;
-  }
   submitBtn.click();
 };
 
+const isValidForm = () => {
+  const submitBtn = document.getElementById("submit-btn");
+  if (!validatePhone() || !validateInn()) {
+    return false;
+  }
+  if (!submitBtn) {
+    alert("Заполните все поля");
+    return false;
+  } else if (!selectedLocation) {
+    alert("Выберите местоположение на карте");
+    return false;
+  }
+  return true;
+};
+
 const validatePhone = () => {
+  const phoneInput = document.getElementById("phone-input");
   if (phoneInput.value.length < 19) {
+    console.log("validatePhone", phoneInput.value.length);
     alert("Введите корректный номер телефона");
     return false;
   }
@@ -26,6 +32,7 @@ const validatePhone = () => {
 const validateInn = () => {
   const innInput = document.getElementById("inn-input");
   if (innInput.value.length < 10) {
+    console.log("validateInn", innInput.value.length);
     alert("Введите корректный ИНН");
     return false;
   }
@@ -131,6 +138,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // Function to create a select element with options
   const createSelectElement = (id, options, placeholder) => {
     const select = document.createElement("select");
+    const label = document.createElement("label");
+    label.textContent = placeholder;
+    label.htmlFor = id;
     select.name = id;
     select.id = id;
     select.required = true;
@@ -274,14 +284,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   formContent.addEventListener("submit", (event) => {
     event.preventDefault();
-    const formData = new FormData(event.target);
-    const data = {};
-    formData.forEach((value, key) => {
-      data[key] = value;
-    });
-    // DemoApp.sendData();
-    DemoApp.sendNotification("Operation successful!");
-    DemoApp.close();
+    if (isValidForm()) {
+      const formData = new FormData(event.target);
+      const data = {};
+      formData.forEach((value, key) => {
+        data[key] = value;
+      });
+      // DemoApp.sendData();
+      DemoApp.sendNotification("Operation successful!");
+      DemoApp.close();
+    }
   });
 
   // Initial event listener for the 'zone' select element
