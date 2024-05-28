@@ -17,23 +17,19 @@ const onClickSubmitBtn = () => {
 
 const validatePhone = () => {
   if (phoneInput.value.length < 19) {
-    phoneInput.setCustomValidity("Введите корректный номер телефона");
+    alert("Введите корректный номер телефона");
     return false;
-  } else {
-    phoneInput.setCustomValidity("");
-    return true;
   }
+  return true;
 };
 
 const validateInn = () => {
   const innInput = document.getElementById("inn-input");
   if (innInput.value.length < 10) {
-    innInput.setCustomValidity("Введите корректный ИНН");
+    alert("Введите корректный ИНН");
     return false;
-  } else {
-    innInput.setCustomValidity("");
-    return true;
   }
+  return true;
 };
 
 const initYandexMap = () => {
@@ -288,7 +284,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <input type="text" required name="address" id="address-input" class="text-input" placeholder="Адрес" />
       <input type="text" required name="reference_point" id="reference-input" class="text-input" placeholder="Ориентир" />
       <div id="map"></div>
-      <button style="visibility: visible" type="submit" name="submit" id="submit-btn">Saqlash</button>`;
+      <button style="visibility: hidden" type="submit" name="submit" id="submit-btn">Saqlash</button>`;
     formContent.appendChild(inputsDiv);
 
     // init yandex-maps
