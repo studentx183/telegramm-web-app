@@ -175,7 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <input type="text" required name="surname" class="text-input" placeholder="surname" />
       <input type="text" required name="phone" id="phone-input" class="text-input" placeholder="phone" />
       <input type="text" required name="inn" id="inn-input" class="text-input" placeholder="inn" />
-      <button type="submit" name="submit" id="submit-btn">Saqlash</button>`;
+      <button style="visibility: hidden" type="submit" name="submit" id="submit-btn">Saqlash</button>`;
     formContent.appendChild(inputsDiv);
 
     // Apply input masks
@@ -220,7 +220,7 @@ const DemoApp = {
     Telegram.WebApp.MainButton.setParams({
       text: "Сохранить",
       is_visible: true,
-    }).onClick();
+    }).onClick(onClickSubmitBtn);
   },
 
   expand() {
