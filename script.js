@@ -197,16 +197,63 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Initial event listener for the 'zone' select element
   document.getElementById("zone").addEventListener("change", handleZoneChange);
+
+  initYandexMap();
 });
 
 const onClickSubmitBtn = () => {
   const submitBtn = document.getElementById("submit-btn");
-  if(!submitBtn) {
+  if (!submitBtn) {
     alert("Заполните все поля");
-    return
+    return;
   }
   submitBtn.click();
-}
+};
+
+const initYandexMap = () => {
+  Telegram.WebApp.ready();
+
+  const userCoords = DemoApp.requestLocation() || {
+    latitude: 41.2995,
+    longitude: 69.2401,
+  };
+
+  ymaps.ready(init);
+
+  function init() {
+    var map = new ymaps.Map("map", {
+      center: [userCoords?.latitude, userCoords?.longitude],
+      zoom: 10,
+    });
+
+    var placemark;
+
+    map.events.add("click", function (e) {
+      var coords = e.get("coords");
+
+      if (placemark) {
+        placemark.geometry.setCoordinates(coords);
+      } else {
+        placemark = new ymaps.Placemark(
+          coords,
+          {},
+          {
+            draggable: true,
+          }
+        );
+        map.geoObjects.add(placemark);
+      }
+
+      // Send the location data back to Telegram
+      Telegram.WebApp.sendData(
+        JSON.stringify({
+          latitude: coords[0],
+          longitude: coords[1],
+        })
+      );
+    });
+  }
+};
 
 const DemoApp = {
   initData: Telegram.WebApp.initData || "",
@@ -284,7 +331,6 @@ const DemoApp = {
     );
   },
 
- 
   checkInitData() {
     const webViewStatus = document.querySelector("#webview_data_status");
     if (
@@ -305,45 +351,17 @@ const DemoApp = {
     }
   },
 
-  showPopup() {
-    Telegram.WebApp.showPopup(
-      {
-        title: "Popup title",
-        message: "Popup message",
-        buttons: [
-          { id: "delete", type: "destructive", text: "Delete all" },
-          { id: "faq", type: "default", text: "Open FAQ" },
-          { type: "cancel" },
-        ],
-      },
-      function (buttonId) {
-        if (buttonId === "delete") {
-          DemoApp.showAlert("'Delete all' selected");
-        } else if (buttonId === "faq") {
-          Telegram.WebApp.openLink("https://telegram.org/faq");
-        }
-      }
-    );
-  },
-
   // Permissions
-  requestLocation(el) {
+  requestLocation() {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(function (position) {
-        el.nextElementSibling.innerHTML =
-          "(" +
-          position.coords.latitude +
-          ", " +
-          position.coords.longitude +
-          ")";
-        el.nextElementSibling.className = "ok";
-      });
-    } else {
-      el.nextElementSibling.innerHTML =
-        "Geolocation is not supported in this browser.";
-      el.nextElementSibling.className = "err";
+      return navigator.geolocation.getCurrentPosition(
+        (position) => {
+          console.log(position, 'position');
+          return position.coords
+        }
+      );
     }
-    return false;
+    return undefined;
   },
 
   // Other
