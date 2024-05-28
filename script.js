@@ -310,7 +310,7 @@ const DemoApp = {
     document.body.style.visibility = "";
     Telegram.WebApp.ready();
     Telegram.WebApp.MainButton.setParams({
-      text: "Сохранить",
+      text: "Подать",
       is_visible: true,
     }).onClick(onClickSubmitBtn);
   },
