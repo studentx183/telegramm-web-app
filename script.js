@@ -1,4 +1,4 @@
-const selectedLocation = null;
+let selectedLocation = null;
 
 const onClickSubmitBtn = () => {
   const submitBtn = document.getElementById("submit-btn");
@@ -237,7 +237,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <input type="text" required name="phone" id="phone-input" class="text-input" placeholder="phone" />
       <input type="text" required name="inn" id="inn-input" class="text-input" placeholder="inn" />
       <div id="map"></div>
-      <button style="visibility: hidden" type="submit" name="submit" id="submit-btn">Saqlash</button>`;
+      <button style="visibility: visible" type="submit" name="submit" id="submit-btn">Saqlash</button>`;
     formContent.appendChild(inputsDiv);
 
     // init yandex-maps
