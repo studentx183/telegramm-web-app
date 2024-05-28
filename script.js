@@ -61,6 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const select = document.createElement("select");
     select.name = id;
     select.id = id;
+    select.required = true;
     select.innerHTML = `<option disabled selected required>${placeholder}</option>`;
     Object.entries(options).forEach(([value, name]) => {
       const option = document.createElement("option");
@@ -170,11 +171,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const inputsDiv = document.createElement("div");
     inputsDiv.id = "inputs";
     inputsDiv.innerHTML = `
-      <input type="text" name="name" class="text-input" placeholder="name" />
-      <input type="text" name="surname" class="text-input" placeholder="surname" />
-      <input type="text" name="phone" id="phone-input" class="text-input" placeholder="phone" />
-      <input type="text" name="inn" id="inn-input" class="text-input" placeholder="inn" />
-      <button type="submit" name="submit">Saqlash</button>`;
+      <input type="text" required name="name" class="text-input" placeholder="name" />
+      <input type="text" required name="surname" class="text-input" placeholder="surname" />
+      <input type="text" required name="phone" id="phone-input" class="text-input" placeholder="phone" />
+      <input type="text" required name="inn" id="inn-input" class="text-input" placeholder="inn" />
+      <button type="submit" name="submit" id="submit-btn">Saqlash</button>`;
     formContent.appendChild(inputsDiv);
 
     // Apply input masks
@@ -198,6 +199,15 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("zone").addEventListener("change", handleZoneChange);
 });
 
+const onClickSubmitBtn = () => {
+  const submitBtn = document.getElementById("submit-btn");
+  if(!submitBtn) {
+    alert("Заполните все поля");
+    return
+  }
+  submitBtn.click();
+}
+
 const DemoApp = {
   initData: Telegram.WebApp.initData || "",
   initDataUnsafe: Telegram.WebApp.initDataUnsafe || {},
@@ -208,9 +218,9 @@ const DemoApp = {
     document.body.style.visibility = "";
     Telegram.WebApp.ready();
     Telegram.WebApp.MainButton.setParams({
-      text: "CLOSE WEBVIEW",
+      text: "Сохранить",
       is_visible: true,
-    }).onClick(DemoApp.close);
+    }).onClick();
   },
 
   expand() {
