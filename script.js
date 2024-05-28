@@ -149,7 +149,6 @@ document.addEventListener("DOMContentLoaded", () => {
     removeElementsById([
       "region",
       "city",
-      "territory",
       "inputs",
       "format",
       "category",
@@ -171,7 +170,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const handleRegionChange = (event) => {
     removeElementsById([
       "city",
-      "territory",
       "inputs",
       "format",
       "category",
@@ -185,31 +183,8 @@ document.addEventListener("DOMContentLoaded", () => {
       data.regions[selectedRegion],
       "Shaharni tanlang"
     );
-    citySelect.addEventListener("change", handleTerritoryChange);
+    citySelect.addEventListener("change", handleCityChange);
     formContent.appendChild(citySelect);
-  };
-
-  const handleTerritoryChange = () => {
-    removeElementsById([
-      "territory",
-      "inputs",
-      "format",
-      "category",
-      "channel",
-      "type",
-      "map",
-    ]);
-    const formatSelect = createSelectElement(
-      "territory",
-      {
-        format1: "Territory 1",
-        format2: "Territory 2",
-        format3: "Territory 3",
-      },
-      "Territoryni tanlang"
-    );
-    formatSelect.addEventListener("change", handleCityChange);
-    formContent.appendChild(formatSelect);
   };
 
   // Function to handle city selection
