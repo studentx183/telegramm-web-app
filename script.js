@@ -222,27 +222,25 @@ const initYandexMap = () => {
 
   function init() {
     var map = new ymaps.Map("map", {
-      center: [userCoords?.latitude, userCoords?.longitude],
-      zoom: 10,
+      center: [userCoords.latitude, userCoords.longitude],
+      zoom: 15,
     });
 
-    var placemark;
+    // Place initial marker at user's coordinates
+    var placemark = new ymaps.Placemark(
+      [userCoords.latitude, userCoords.longitude],
+      {},
+      {
+        draggable: true,
+      }
+    );
+    map.geoObjects.add(placemark);
 
+    // Update marker position on map click
     map.events.add("click", function (e) {
       var coords = e.get("coords");
 
-      if (placemark) {
-        placemark.geometry.setCoordinates(coords);
-      } else {
-        placemark = new ymaps.Placemark(
-          coords,
-          {},
-          {
-            draggable: true,
-          }
-        );
-        map.geoObjects.add(placemark);
-      }
+      placemark.geometry.setCoordinates(coords);
 
       // Send the location data back to Telegram
       Telegram.WebApp.sendData(
@@ -354,12 +352,10 @@ const DemoApp = {
   // Permissions
   requestLocation() {
     if (navigator.geolocation) {
-      return navigator.geolocation.getCurrentPosition(
-        (position) => {
-          console.log(position, 'position');
-          return position.coords
-        }
-      );
+      return navigator.geolocation.getCurrentPosition((position) => {
+        console.log(position, "position");
+        return position.coords;
+      });
     }
     return undefined;
   },
