@@ -221,17 +221,6 @@ const DemoApp = {
     Telegram.WebApp.close();
   },
 
-  toggleMainButton(el) {
-    const mainButton = Telegram.WebApp.MainButton;
-    if (mainButton.isVisible) {
-      mainButton.hide();
-      el.innerHTML = "Show Main Button";
-    } else {
-      mainButton.show();
-      el.innerHTML = "Hide Main Button";
-    }
-  },
-
   // actions
   sendData(data) {
     Telegram.WebApp.sendData(JSON.stringify(data));
@@ -285,46 +274,7 @@ const DemoApp = {
     );
   },
 
-  changeMenuButton(close) {
-    document.querySelectorAll("button").forEach((btn) => (btn.disabled = true));
-    const btnStatus = document.querySelector("#btn_status");
-    btnStatus.textContent = "Changing button...";
-
-    DemoApp.apiRequest("changeMenuButton", {}, function (result) {
-      document
-        .querySelectorAll("button")
-        .forEach((btn) => (btn.disabled = false));
-
-      if (result.response) {
-        if (result.response.ok) {
-          btnStatus.textContent = "Button changed!";
-          btnStatus.className = "ok";
-          btnStatus.style.display = "block";
-          Telegram.WebApp.close();
-        } else {
-          btnStatus.textContent = result.response.description;
-          btnStatus.className = "err";
-          btnStatus.style.display = "block";
-          alert(result.response.description);
-        }
-      } else if (result.error) {
-        btnStatus.textContent = result.error;
-        btnStatus.className = "err";
-        btnStatus.style.display = "block";
-        alert(result.error);
-      } else {
-        btnStatus.textContent = "Unknown error";
-        btnStatus.className = "err";
-        btnStatus.style.display = "block";
-        alert("Unknown error");
-      }
-    });
-    if (close) {
-      setTimeout(function () {
-        Telegram.WebApp.close();
-      }, 50);
-    }
-  },
+ 
   checkInitData() {
     const webViewStatus = document.querySelector("#webview_data_status");
     if (
@@ -344,73 +294,7 @@ const DemoApp = {
       });
     }
   },
-  sendText(spam) {
-    const textField = document.querySelector("#text_field");
-    const text = textField.value;
-    if (!text.length) {
-      return textField.focus();
-    }
-    if (byteLength(text) > 4096) {
-      return alert("Text is too long");
-    }
 
-    const repeat = spam ? 10 : 1;
-    for (let i = 0; i < repeat; i++) {
-      Telegram.WebApp.sendData(text);
-    }
-  },
-  sendTime(spam) {
-    const repeat = spam ? 10 : 1;
-    for (let i = 0; i < repeat; i++) {
-      Telegram.WebApp.sendData(new Date().toString());
-    }
-  },
-
-  // Alerts
-  showAlert(message) {
-    Telegram.WebApp.showAlert(message);
-  },
-  showConfirm(message) {
-    Telegram.WebApp.showConfirm(message);
-  },
-  requestWriteAccess() {
-    Telegram.WebApp.requestWriteAccess(function (result) {
-      if (result) {
-        DemoApp.showAlert("Write access granted");
-      } else {
-        DemoApp.showAlert("Write access denied");
-      }
-    });
-  },
-  requestContact() {
-    Telegram.WebApp.requestContact(function (result) {
-      if (result) {
-        DemoApp.showAlert("Contact granted");
-      } else {
-        DemoApp.showAlert("Contact denied");
-      }
-    });
-  },
-  isVersionAtLeast(version) {
-    return Telegram.WebApp.isVersionAtLeast(version);
-  },
-  //version to string Example: '6.9'
-  doesntSupport(version) {
-    // console.log("version: " + version);
-    // console.log("realVersion: " + this.version());
-    // console.log("doesntSupport: " + this.isVersionAtLeast(version));
-    if (!this.isVersionAtLeast(version)) {
-      Telegram.WebApp.showAlert(
-        "This feature is not supported in this version of Telegram",
-        function () {
-          Telegram.WebApp.close();
-        }
-      );
-      throw new Error(
-        "This feature is not supported in this version of Telegram"
-      );
-    }
-  },
   showPopup() {
     Telegram.WebApp.showPopup(
       {
@@ -427,32 +311,6 @@ const DemoApp = {
           DemoApp.showAlert("'Delete all' selected");
         } else if (buttonId === "faq") {
           Telegram.WebApp.openLink("https://telegram.org/faq");
-        }
-      }
-    );
-  },
-  showScanQrPopup: function (linksOnly) {
-    Telegram.WebApp.showScanQrPopup(
-      {
-        text: linksOnly ? "with any link" : "for test purposes",
-      },
-      function (text) {
-        if (linksOnly) {
-          const lowerText = text.toString().toLowerCase();
-          if (
-            lowerText.substring(0, 7) === "http://" ||
-            lowerText.substring(0, 8) === "https://"
-          ) {
-            setTimeout(function () {
-              Telegram.WebApp.openLink(text);
-            }, 50);
-
-            return true;
-          }
-        } else {
-          DemoApp.showAlert(text);
-
-          return true;
         }
       }
     );
@@ -475,63 +333,6 @@ const DemoApp = {
         "Geolocation is not supported in this browser.";
       el.nextElementSibling.className = "err";
     }
-    return false;
-  },
-  requestVideo(el) {
-    if (navigator.mediaDevices) {
-      navigator.mediaDevices
-        .getUserMedia({ audio: false, video: true })
-        .then(function (stream) {
-          el.nextElementSibling.innerHTML = "(Access granted)";
-        });
-    } else {
-      el.nextElementSibling.innerHTML =
-        "Media devices is not supported in this browser.";
-      el.nextElementSibling.className = "err";
-    }
-    return false;
-  },
-  requestAudio(el) {
-    if (navigator.mediaDevices) {
-      navigator.mediaDevices
-        .getUserMedia({ audio: true, video: false })
-        .then(function (stream) {
-          el.nextElementSibling.innerHTML = "(Access granted)";
-          el.nextElementSibling.className = "ok";
-        });
-    } else {
-      el.nextElementSibling.innerHTML =
-        "Media devices is not supported in this browser.";
-      el.nextElementSibling.className = "err";
-    }
-    return false;
-  },
-  requestAudioVideo(el) {
-    if (navigator.mediaDevices) {
-      navigator.mediaDevices
-        .getUserMedia({ audio: true, video: true })
-        .then(function (stream) {
-          el.nextElementSibling.innerHTML = "(Access granted)";
-          el.nextElementSibling.className = "ok";
-        });
-    } else {
-      el.nextElementSibling.innerHTML =
-        "Media devices is not supported in this browser.";
-      el.nextElementSibling.className = "err";
-    }
-    return false;
-  },
-  testClipboard(el) {
-    Telegram.WebApp.readTextFromClipboard(function (clipText) {
-      if (clipText === null) {
-        el.nextElementSibling.innerHTML = "Clipboard text unavailable.";
-        el.nextElementSibling.className = "err";
-      } else {
-        el.nextElementSibling.innerHTML =
-          "(Read from clipboard: Â«" + clipText + "Â»)";
-        el.nextElementSibling.className = "ok";
-      }
-    });
     return false;
   },
 
