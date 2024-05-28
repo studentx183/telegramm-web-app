@@ -196,6 +196,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Initial event listener for the 'zone' select element
   document.getElementById("zone").addEventListener("change", handleZoneChange);
+  
+  DemoApp.checkInitData();
+  DemoApp.init();
 });
 
 const DemoApp = {
@@ -576,5 +579,3 @@ const DemoApp = {
       });
   },
 };
-
-DemoApp.init();
