@@ -1,3 +1,5 @@
+// const { getRegions } = require("./requests");
+
 let selectedLocation = null;
 
 const onClickSubmitBtn = () => {
@@ -248,7 +250,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Function to handle region selection
-  const handleRegionChange = (event) => {
+  const handleRegionChange = async (event) => {
     removeElementsById([
       "city",
       "inputs",
@@ -258,14 +260,20 @@ document.addEventListener("DOMContentLoaded", () => {
       "type",
       "map",
     ]);
+
+    // const regions = await getRegions();
+
     const selectedRegion = event.target.value;
+
     const citySelect = createSelectElement(
       "city",
       data.regions[selectedRegion],
       "Shahar",
       "Shaharni tanlang"
     );
+
     citySelect.addEventListener("change", handleCityChange);
+
     formContent.appendChild(citySelect);
   };
 
