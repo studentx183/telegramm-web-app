@@ -157,7 +157,10 @@ const initYandexMap = () => {
 };
 
 window.addEventListener("load", function () {
-  DemoAppInitData.init();
+  DemoApp.init();
+  console.log(Telegram.WebApp, 'webAPp');
+  DemoApp.userTheme = Telegram.WebApp?.ThemeParams;
+  adoptToUserTheme();
 });
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -548,17 +551,5 @@ const DemoApp = {
       .catch(function (error) {
         onCallback && onCallback({ error: "Server error" });
       });
-  },
-};
-
-const DemoAppInitData = {
-  init() {
-    DemoApp.init();
-    DemoApp.userTheme = Telegram.WebApp.ThemeParams;
-    adoptToUserTheme();
-    Telegram.WebApp.onEvent("themeChanged", function () {
-      DemoApp.userTheme = Telegram.WebApp.ThemeParams;
-      adoptToUserTheme();
-    });
   },
 };
