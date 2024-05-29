@@ -10,7 +10,7 @@ const adoptToUserTheme = () => {
   const main = document.querySelector("main");
   userInfoDiv.textContent = JSON.stringify(
     Object.keys(DemoApp.userTheme || {}).length
-      ? Telegram.WebApp?.ThemeParams
+      ? DemoApp.userTheme
       : "Not Found ThemeParams"
   );
   main.appendChild(userInfoDiv);
@@ -425,7 +425,7 @@ const DemoApp = {
   initDataUnsafe: Telegram.WebApp.initDataUnsafe || {},
   MainButton: Telegram.WebApp.MainButton,
   isClosingConfirmationEnabled: true,
-  userTheme: Telegram.WebApp.ThemeParams || {},
+  userTheme: Telegram.WebApp?.themeParams || {},
 
   init(options) {
     document.body.style.visibility = "";
