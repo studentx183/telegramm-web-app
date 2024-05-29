@@ -8,7 +8,7 @@ const onClickSubmitBtn = () => {
 const adoptToUserTheme = () => {
   const userInfoDiv = document.createElement('div')
   const main = document.querySelector('main');
-  userInfoDiv.textContent = JSON.stringify(DemoApp.initDataUnsafe);
+  userInfoDiv.textContent = JSON.stringify(DemoApp.userTheme);
   main.appendChild(userInfoDiv);
   // --------------------------------
   const userTheme = DemoApp.userTheme;
@@ -220,6 +220,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const select = document.createElement("select");
     const label = document.createElement("label");
     label.textContent = _label;
+    label.style.color = DemoApp.userTheme.button_color
     select.name = id;
     select.id = id;
     select.required = true;
