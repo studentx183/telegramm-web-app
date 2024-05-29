@@ -2,7 +2,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
 }
 
 .main {
@@ -11,7 +11,7 @@
 }
 
 form label {
-  color: #222;
+  color: var(--tg-theme-accent-text-color, #222);
   display: block;
   margin-bottom: 4px;
 }
