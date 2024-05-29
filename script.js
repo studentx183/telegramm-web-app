@@ -7,7 +7,6 @@ const onClickSubmitBtn = () => {
 
 const adoptToUserTheme = () => {
   const userInfoDiv = document.createElement("div");
-  userInfoDiv.id = 'adsjaklsdjalkjdlkajdlkjalkjdkljaklsdjalkjsduirjrfnu'
   const main = document.querySelector("main");
   userInfoDiv.textContent = JSON.stringify(DemoApp.userTheme);
   main.appendChild(userInfoDiv);
@@ -154,21 +153,8 @@ const initYandexMap = () => {
   }
 };
 
-// init user theme
-const initUserThemeAdopt = () => {
-  DemoApp.init();
-  DemoApp.userTheme = Telegram.WebApp.ThemeParams;
-  adoptToUserTheme();
-  Telegram.WebApp.onEvent("themeChanged", function () {
-    DemoApp.userTheme = Telegram.WebApp.ThemeParams;
-    adoptToUserTheme();
-  });
-};
-
 document.addEventListener("DOMContentLoaded", () => {
   const formContent = document.getElementById("addForm");
-
-  initUserThemeAdopt();
 
   // Data for regions and cities
   const data = {
@@ -232,7 +218,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const select = document.createElement("select");
     const label = document.createElement("label");
     label.textContent = _label;
-    label.style.color = DemoApp.userTheme?.button_color;
+    label.style.color = DemoApp.userTheme.button_color;
     select.name = id;
     select.id = id;
     select.required = true;
@@ -555,5 +541,17 @@ const DemoApp = {
       .catch(function (error) {
         onCallback && onCallback({ error: "Server error" });
       });
+  },
+};
+
+const DemoAppInitData = {
+  init() {
+    DemoApp.init();
+    DemoApp.userTheme = Telegram.WebApp.ThemeParams;
+    adoptToUserTheme();
+    Telegram.WebApp.onEvent("themeChanged", function () {
+      DemoApp.userTheme = Telegram.WebApp.ThemeParams;
+      adoptToUserTheme();
+    });
   },
 };
