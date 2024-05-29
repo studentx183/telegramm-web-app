@@ -11,7 +11,7 @@
 }
 
 form label {
-  color: var(--tg-theme-button-text-color);
+  color: #222;
   font-size: 0.8rem;
   display: block;
   margin-bottom: 4px;
