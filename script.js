@@ -6,6 +6,11 @@ const onClickSubmitBtn = () => {
 };
 
 const adoptToUserTheme = () => {
+  const userInfoDiv = document.createElement('div')
+  const main = document.querySelector('main');
+  userInfoDiv.textContent = JSON.stringify(DemoApp.userTheme);
+  main.appendChild(userInfoDiv);
+  // --------------------------------
   const userTheme = DemoApp.userTheme;
   const textColor = userTheme?.button_color;
   const labels = document.querySelectorAll("label");
@@ -150,8 +155,6 @@ const initYandexMap = () => {
 
 document.addEventListener("DOMContentLoaded", () => {
   const formContent = document.getElementById("addForm");
-  DemoApp.init();
-  adoptToUserTheme();
 
   // Data for regions and cities
   const data = {
@@ -490,26 +493,6 @@ const DemoApp = {
     );
   },
 
-  checkInitData() {
-    const webViewStatus = document.querySelector("#webview_data_status");
-    if (
-      DemoApp.initDataUnsafe.query_id &&
-      DemoApp.initData &&
-      webViewStatus.classList.contains("status_need")
-    ) {
-      webViewStatus.classList.remove("status_need");
-      DemoApp.apiRequest("checkInitData", {}, function (result) {
-        if (result.ok) {
-          webViewStatus.textContent = "Hash is correct (async)";
-          webViewStatus.className = "ok";
-        } else {
-          webViewStatus.textContent = result.error + " (async)";
-          webViewStatus.className = "err";
-        }
-      });
-    }
-  },
-
   // Permissions
   requestLocation() {
     if (navigator.geolocation) {
@@ -558,5 +541,15 @@ const DemoApp = {
       .catch(function (error) {
         onCallback && onCallback({ error: "Server error" });
       });
+  },
+};
+
+const DemoAppInitData = {
+  init() {
+    DemoApp.init();
+    Telegram.WebApp.onEvent("themeChanged", function () {
+      adoptToUserTheme()
+    });
+    adoptToUserTheme()
   },
 };
