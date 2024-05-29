@@ -11,7 +11,7 @@
 }
 
 form label {
-  color: #222;
+  color: var(--tg-color-scheme);
   font-size: 0.8rem;
   display: block;
   margin-bottom: 4px;

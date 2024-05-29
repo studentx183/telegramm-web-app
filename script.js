@@ -156,7 +156,7 @@ const initYandexMap = () => {
 document.addEventListener("DOMContentLoaded", () => {
   const formContent = document.getElementById("addForm");
   
-  adoptToUserTheme();
+  // adoptToUserTheme();
 
   // Data for regions and cities
   const data = {
@@ -220,7 +220,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const select = document.createElement("select");
     const label = document.createElement("label");
     label.textContent = _label;
-    label.style.color = DemoApp.userTheme.button_color
+    // label.style.color = DemoApp.userTheme.button_color
     select.name = id;
     select.id = id;
     select.required = true;
