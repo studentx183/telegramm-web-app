@@ -140,10 +140,6 @@ const initYandexMap = () => {
   }
 };
 
-window.addEventListener("load", function () {
-  DemoAppInitData.init();
-});
-
 document.addEventListener("DOMContentLoaded", () => {
   const formContent = document.getElementById("addForm");
 
@@ -485,8 +481,10 @@ const DemoApp = {
 
   // Permissions
   requestLocation() {
+    console.log(navigator.geolocation, 'location');
     if (navigator.geolocation) {
       return navigator.geolocation.getCurrentPosition((position) => {
+        console.log(position, 'position');
         return position.coords;
       });
     }
