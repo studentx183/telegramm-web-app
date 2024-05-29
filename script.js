@@ -551,7 +551,7 @@ const DemoAppInitData = {
       DemoApp.userTheme = Telegram.WebApp.ThemeParams;
       adoptToUserTheme();
     });
-    adoptToUserTheme();
     DemoApp.userTheme = Telegram.WebApp.ThemeParams;
+    adoptToUserTheme();
   },
 };
