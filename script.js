@@ -339,32 +339,32 @@ document.addEventListener("DOMContentLoaded", () => {
     inputsDiv.id = "inputs";
     inputsDiv.innerHTML = `
       <div style="position: relative">
-        <label for="name">Названия</label>
+        <label for="name-input">Названия</label>
         <input type="text" required name="name" id="name-input" class="text-input" placeholder="Названия магазина" />
         <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
       </div>
         <div style="position: relative">
-        <label for="name">Юридическое названия</label>
+        <label for="legal-name-input">Юридическое названия</label>
         <input type="text" required name="legal_name" id="legal-name-input" class="text-input" placeholder="Юридическое название" />
         <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
       </div>
       <div style="position: relative">
-        <label for="name">Телефон</label>
+        <label for="phone-input">Телефон</label>
         <input type="text" required name="phone" id="phone-input" class="text-input" placeholder="Телефон" />
         <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
       </div>
       <div style="position: relative">
-        <label for="name">Инн</label>
+        <label for="inn-input">Инн</label>
         <input type="text" required name="inn" id="inn-input" class="text-input" placeholder="Инн" />
         <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
       </div>
       <div style="position: relative">
-        <label for="name">Адрес</label>
+        <label for="address-input">Адрес</label>
         <input type="text" required name="address" id="address-input" class="text-input" placeholder="Адрес" />
         <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
       </div>
       <div style="position: relative">
-        <label for="name">Ориентир</label>
+        <label for="reference-input">Ориентир</label>
         <input type="text" required name="reference_point" id="reference-input" class="text-input" placeholder="Ориентир" />
         <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
       </div>
@@ -485,14 +485,22 @@ const DemoApp = {
 
   // Permissions
   requestLocation() {
-    console.log(navigator.geolocation, 'location');
-    if (navigator.geolocation) {
-      return navigator.geolocation.getCurrentPosition((position) => {
-        console.log(position, 'position');
-        return position.coords;
-      });
+    // added to localStorage not to ask permission for coords everytime
+    const memorizedCoords = localStorage.getItem("user-coords");
+    if (memorizedCoords) {
+      try {
+        const parsedMemorizedCoords = JSON.parse(memorizedCoords);
+        return parsedMemorizedCoords;
+      } catch (error) {}
+    } else {
+      if (navigator.geolocation) {
+        return navigator.geolocation.getCurrentPosition((position) => {
+          localStorage.set("user-coords", JSON.stringify(position.coords));
+          return position.coords;
+        });
+      }
+      return undefined;
     }
-    return undefined;
   },
 
   // Other
