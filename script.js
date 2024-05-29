@@ -5,8 +5,31 @@ const onClickSubmitBtn = () => {
   submitBtn.click();
 };
 
+const adoptToUserTheme = () => {
+  const userTheme = Telegram.WebApp?.ThemeParams;
+  const textColor = userTheme?.text_color;
+  const labels = document.querySelectorAll("label");
+  labels.forEach((label) => (label.style.color = textColor));
+};
+
+// validations
 const isValidForm = () => {
-  if (!validatePhone() || !validateInn()) {
+  const isNameValid = validateName();
+  const isPhoneValid = validatePhone();
+  const isInnValid = validateInn();
+  const isLegalNameValid = validateLegalName();
+  const isAddressValid = validateAddress();
+  const isReferencePointValid = validateReferencePoint();
+  const submitBtn = document.getElementById("submit-btn");
+
+  if (
+    !isNameValid ||
+    !isPhoneValid ||
+    !isInnValid ||
+    !isLegalNameValid ||
+    !isAddressValid ||
+    !isReferencePointValid
+  ) {
     return false;
   }
   if (!submitBtn) {
@@ -21,24 +44,72 @@ const isValidForm = () => {
 
 const validatePhone = () => {
   const phoneInput = document.getElementById("phone-input");
-  if (phoneInput.value.length < 19) {
-    console.log("validatePhone", phoneInput.value.length);
-    alert("Введите корректный номер телефона");
+  console.log(phoneInput.value.length);
+  const errorTag = phoneInput.nextElementSibling;
+  if (phoneInput.value.length !== 19) {
+    errorTag.textContent = "*Введите корректный номер телефона";
     return false;
   }
+  errorTag.textContent = null;
   return true;
 };
 
 const validateInn = () => {
   const innInput = document.getElementById("inn-input");
+  const errorTag = innInput.nextElementSibling;
   if (innInput.value.length < 10) {
-    console.log("validateInn", innInput.value.length);
-    alert("Введите корректный ИНН");
+    errorTag.textContent = "*Введите корректный ИНН";
     return false;
   }
+  errorTag.textContent = null;
   return true;
 };
 
+const validateAddress = () => {
+  const addressInput = document.getElementById("address-input");
+  const errorTag = addressInput.nextElementSibling;
+  if (addressInput.value.length < 5) {
+    errorTag.textContent = "*Обязательное поле";
+    return false;
+  }
+  errorTag.textContent = null;
+  return true;
+};
+
+const validateName = () => {
+  const nameInput = document.getElementById("name-input");
+  const errorTag = nameInput.nextElementSibling;
+  if (nameInput.value.length < 5) {
+    errorTag.textContent = "*Обязательное поле";
+    return false;
+  }
+  errorTag.textContent = null;
+  return true;
+};
+
+const validateLegalName = () => {
+  const legalNameInput = document.getElementById("legal-name-input");
+  const errorTag = legalNameInput.nextElementSibling;
+  if (legalNameInput.value.length < 5) {
+    errorTag.textContent = "*Обязательное поле";
+    return false;
+  }
+  errorTag.textContent = null;
+  return true;
+};
+
+const validateReferencePoint = () => {
+  const referenceInput = document.getElementById("reference-input");
+  const errorTag = referenceInput.nextElementSibling;
+  if (referenceInput.value.length < 5) {
+    errorTag.textContent = "*Обязательное поле";
+    return false;
+  }
+  errorTag.textContent = null;
+  return true;
+};
+
+// yandex map
 const initYandexMap = () => {
   Telegram.WebApp.ready();
 
@@ -79,6 +150,8 @@ const initYandexMap = () => {
 
 document.addEventListener("DOMContentLoaded", () => {
   const formContent = document.getElementById("addForm");
+  
+  adoptToUserTheme();
 
   // Data for regions and cities
   const data = {
@@ -136,11 +209,12 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Function to create a select element with options
-  const createSelectElement = (id, options, placeholder) => {
+  const createSelectElement = (id, options, _label, placeholder) => {
+    const selectContent = document.createElement("div");
+    selectContent.id = id;
     const select = document.createElement("select");
     const label = document.createElement("label");
-    label.textContent = placeholder;
-    label.htmlFor = id;
+    label.textContent = _label;
     select.name = id;
     select.id = id;
     select.required = true;
@@ -151,7 +225,9 @@ document.addEventListener("DOMContentLoaded", () => {
       option.textContent = name;
       select.appendChild(option);
     });
-    return select;
+    selectContent.appendChild(label);
+    selectContent.appendChild(select);
+    return selectContent;
   };
 
   // Function to handle zone selection
@@ -170,6 +246,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const regionSelect = createSelectElement(
       "region",
       data.zones[selectedZone],
+      "Region",
       "Regionni tanlang"
     );
     regionSelect.addEventListener("change", handleRegionChange);
@@ -191,6 +268,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const citySelect = createSelectElement(
       "city",
       data.regions[selectedRegion],
+      "Shahar",
       "Shaharni tanlang"
     );
     citySelect.addEventListener("change", handleCityChange);
@@ -210,6 +288,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const formatSelect = createSelectElement(
       "format",
       { format1: "Format 1", format2: "Format 2", format3: "Format 3" },
+      "Format",
       "Formatni tanlang"
     );
     formatSelect.addEventListener("change", handleFormatChange);
@@ -226,6 +305,7 @@ document.addEventListener("DOMContentLoaded", () => {
         category2: "Category 2",
         category3: "Category 3",
       },
+      "Category",
       "Categoryni tanlang"
     );
     categorySelect.addEventListener("change", handleCategoryChange);
@@ -238,6 +318,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const channelSelect = createSelectElement(
       "channel",
       { channel1: "Channel 1", channel2: "Channel 2", channel3: "Channel 3" },
+      "Channel",
       "Channelni tanlang"
     );
     channelSelect.addEventListener("change", handleChannelChange);
@@ -250,6 +331,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const typeSelect = createSelectElement(
       "type",
       { type1: "Type 1", type2: "Type 2", type3: "Type 3" },
+      "Type",
       "Typeni tanlang"
     );
     typeSelect.addEventListener("change", handleTypeChange);
@@ -262,12 +344,36 @@ document.addEventListener("DOMContentLoaded", () => {
     const inputsDiv = document.createElement("div");
     inputsDiv.id = "inputs";
     inputsDiv.innerHTML = `
-      <input type="text" required name="name" class="text-input" placeholder="Названия магазина" />
-      <input type="text" required name="legal_name" class="text-input" placeholder="Юридическое название" />
-      <input type="text" required name="phone" id="phone-input" class="text-input" placeholder="Телефон" />
-      <input type="text" required name="inn" id="inn-input" class="text-input" placeholder="Инн" />
-      <input type="text" required name="address" id="address-input" class="text-input" placeholder="Адрес" />
-      <input type="text" required name="reference_point" id="reference-input" class="text-input" placeholder="Ориентир" />
+      <div style="position: relative">
+        <label for="name">Названия</label>
+        <input type="text" required name="name" id="name-input" class="text-input" placeholder="Названия магазина" />
+        <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
+      </div>
+        <div style="position: relative">
+        <label for="name">Юридическое названия</label>
+        <input type="text" required name="legal_name" id="legal-name-input" class="text-input" placeholder="Юридическое название" />
+        <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
+      </div>
+      <div style="position: relative">
+        <label for="name">Телефон</label>
+        <input type="text" required name="phone" id="phone-input" class="text-input" placeholder="Телефон" />
+        <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
+      </div>
+      <div style="position: relative">
+        <label for="name">Инн</label>
+        <input type="text" required name="inn" id="inn-input" class="text-input" placeholder="Инн" />
+        <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
+      </div>
+      <div style="position: relative">
+        <label for="name">Адрес</label>
+        <input type="text" required name="address" id="address-input" class="text-input" placeholder="Адрес" />
+        <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
+      </div>
+      <div style="position: relative">
+        <label for="name">Ориентир</label>
+        <input type="text" required name="reference_point" id="reference-input" class="text-input" placeholder="Ориентир" />
+        <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
+      </div>
       <div id="map"></div>
       <button style="visibility: hidden" type="submit" name="submit" id="submit-btn">Saqlash</button>`;
     formContent.appendChild(inputsDiv);
@@ -290,7 +396,6 @@ document.addEventListener("DOMContentLoaded", () => {
       formData.forEach((value, key) => {
         data[key] = value;
       });
-      // DemoApp.sendData();
       DemoApp.sendNotification("Operation successful!");
       DemoApp.close();
     }
@@ -300,6 +405,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("zone").addEventListener("change", handleZoneChange);
 });
 
+// Telegram Web API
 const DemoApp = {
   initData: Telegram.WebApp.initData || "",
   initDataUnsafe: Telegram.WebApp.initDataUnsafe || {},
@@ -313,10 +419,6 @@ const DemoApp = {
       text: "Подать",
       is_visible: true,
     }).onClick(onClickSubmitBtn);
-  },
-
-  expand() {
-    Telegram.WebApp.expand();
   },
 
   close() {

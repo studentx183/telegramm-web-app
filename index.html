@@ -6,18 +6,24 @@
     <script src="https://telegram.org/js/telegram-web-app.js?1"></script>
     <title>Lalaku ClientAdd WebApp</title>
     <link rel="stylesheet" href="style.css" />
-    <script src="https://api-maps.yandex.ru/2.1/?apikey=6f686192-8142-45eb-a035-c3fe17082152&lang=ru_RU" type="text/javascript"></script>
+    <script
+      src="https://api-maps.yandex.ru/2.1/?apikey=6f686192-8142-45eb-a035-c3fe17082152&lang=ru_RU"
+      type="text/javascript"
+    ></script>
   </head>
 
   <body>
     <main class="main">
       <form method="post" action="#" id="addForm">
-        <select name="zone" id="zone">
-          <option disabled selected required>Zonani tanlang</option>
-          <option value="zone1">Zone 1</option>
-          <option value="zone2">Zone 2</option>
-          <option value="zone3">Zone 3</option>
-        </select>
+        <div>
+          <label for="zone">Zona</label>
+          <select name="zone" id="zone">
+            <option disabled selected required>Zonani tanlang</option>
+            <option value="zone1">Zone 1</option>
+            <option value="zone2">Zone 2</option>
+            <option value="zone3">Zone 3</option>
+          </select>
+        </div>
         <div id="append-container"></div>
       </form>
     </main>
