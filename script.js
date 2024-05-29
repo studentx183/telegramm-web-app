@@ -16,7 +16,7 @@ const adoptToUserTheme = () => {
   main.appendChild(userInfoDiv);
   // --------------------------------
   const userTheme = DemoApp.userTheme;
-  const textColor = userTheme?.button_color;
+  const textColor = userTheme?.accent_text_color;
   const labels = document.querySelectorAll("label");
   labels.forEach((label) => (label.style.color = textColor));
 };
@@ -228,7 +228,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const select = document.createElement("select");
     const label = document.createElement("label");
     label.textContent = _label;
-    label.style.color = DemoApp.userTheme?.button_color;
+    label.style.color = DemoApp.userTheme?.accent_text_color;
     select.name = id;
     select.id = id;
     select.required = true;
