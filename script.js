@@ -49,7 +49,6 @@ const isValidForm = () => {
 
 const validatePhone = () => {
   const phoneInput = document.getElementById("phone-input");
-  console.log(phoneInput.value.length);
   const errorTag = phoneInput.nextElementSibling;
   if (phoneInput.value.length !== 19) {
     errorTag.textContent = "*Введите корректный номер телефона";
