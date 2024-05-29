@@ -9,7 +9,7 @@ const adoptToUserTheme = () => {
   const userInfoDiv = document.createElement("div");
   const main = document.querySelector("main");
   userInfoDiv.textContent = JSON.stringify(
-    Object.keys(Telegram.WebApp?.ThemeParams || {}).length
+    Object.keys(DemoApp.userTheme || {}).length
       ? Telegram.WebApp?.ThemeParams
       : "Not Found ThemeParams"
   );
@@ -159,7 +159,7 @@ const initYandexMap = () => {
 window.addEventListener("load", function () {
   DemoApp.init();
   console.log(Telegram.WebApp, 'webAPp');
-  DemoApp.userTheme = Telegram.WebApp?.ThemeParams;
+  DemoApp.userTheme = Telegram.WebApp?.themeParams;
   adoptToUserTheme();
 });
 
