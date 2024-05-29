@@ -8,7 +8,7 @@ const onClickSubmitBtn = () => {
 const adoptToUserTheme = () => {
   const userInfoDiv = document.createElement('div')
   const main = document.querySelector('main');
-  userInfoDiv.textContent = DemoApp.initDataUnsafe;
+  userInfoDiv.textContent = JSON.stringify(DemoApp.initDataUnsafe);
   main.appendChild(userInfoDiv);
   // --------------------------------
   const userTheme = DemoApp.userTheme;
