@@ -6,15 +6,6 @@ const onClickSubmitBtn = () => {
 };
 
 const adoptToUserTheme = () => {
-  const userInfoDiv = document.createElement("div");
-  const main = document.querySelector("main");
-  userInfoDiv.textContent = JSON.stringify(
-    Object.keys(DemoApp.userTheme || {}).length
-      ? DemoApp.userTheme
-      : "Not Found ThemeParams"
-  );
-  main.appendChild(userInfoDiv);
-  // --------------------------------
   const userTheme = DemoApp.userTheme;
   const textColor = userTheme?.accent_text_color;
   const labels = document.querySelectorAll("label");
