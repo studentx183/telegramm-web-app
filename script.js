@@ -5,13 +5,6 @@ const onClickSubmitBtn = () => {
   submitBtn.click();
 };
 
-const adoptToUserTheme = () => {
-  const userTheme = DemoApp.userTheme;
-  const textColor = userTheme?.accent_text_color;
-  const labels = document.querySelectorAll("label");
-  labels.forEach((label) => (label.style.color = textColor));
-};
-
 // validations
 const isValidForm = () => {
   const isNameValid = validateName();
@@ -216,7 +209,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const select = document.createElement("select");
     const label = document.createElement("label");
     label.textContent = _label;
-    label.style.color = DemoApp.userTheme?.accent_text_color;
     select.name = id;
     select.id = id;
     select.required = true;
@@ -539,16 +531,5 @@ const DemoApp = {
       .catch(function (error) {
         onCallback && onCallback({ error: "Server error" });
       });
-  },
-};
-
-const DemoAppInitData = {
-  init() {
-    DemoApp.init();
-    Telegram.WebApp.onEvent("themeChanged", function () {
-      adoptToUserTheme();
-    });
-    DemoApp.userTheme = Telegram.WebApp?.themeParams;
-    adoptToUserTheme();
   },
 };
