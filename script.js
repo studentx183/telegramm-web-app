@@ -6,8 +6,13 @@ const onClickSubmitBtn = () => {
 };
 
 const adoptToUserTheme = () => {
-  const userTheme = Telegram.WebApp?.ThemeParams;
-  const textColor = userTheme?.text_color;
+  const userInfoDiv = document.createElement('div')
+  const main = document.querySelector('main');
+  userInfoDiv.textContent = DemoApp.initDataUnsafe;
+  main.appendChild(userInfoDiv);
+  // --------------------------------
+  const userTheme = DemoApp.userTheme;
+  const textColor = userTheme?.button_color;
   const labels = document.querySelectorAll("label");
   labels.forEach((label) => (label.style.color = textColor));
 };
@@ -411,6 +416,7 @@ const DemoApp = {
   initDataUnsafe: Telegram.WebApp.initDataUnsafe || {},
   MainButton: Telegram.WebApp.MainButton,
   isClosingConfirmationEnabled: true,
+  userTheme: Telegram.WebApp.ThemeParams || {},
 
   init(options) {
     document.body.style.visibility = "";
