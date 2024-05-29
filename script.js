@@ -495,7 +495,7 @@ const DemoApp = {
     } else {
       if (navigator.geolocation) {
         return navigator.geolocation.getCurrentPosition((position) => {
-          localStorage.set("user-coords", JSON.stringify(position.coords));
+          localStorage.setItem("user-coords", JSON.stringify(position.coords));
           return position.coords;
         });
       }
