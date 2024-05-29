@@ -140,6 +140,10 @@ const initYandexMap = () => {
   }
 };
 
+window.addEventListener("load", function () {
+  DemoApp.init();
+});
+
 document.addEventListener("DOMContentLoaded", () => {
   const formContent = document.getElementById("addForm");
 
