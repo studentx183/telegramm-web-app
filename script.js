@@ -1,4 +1,4 @@
-// const { getRegions } = require("./requests");
+import { getRegions } from "./requests.js"
 
 let selectedLocation = null;
 
@@ -107,10 +107,13 @@ const validateReferencePoint = () => {
 const initYandexMap = () => {
   Telegram.WebApp.ready();
 
-  const userCoords = DemoApp.requestLocation() || {
-    latitude: 41.2995,
-    longitude: 69.2401,
-  };
+  const memoryCoords = localStorage.getItem("userCoords");
+  let userCoords = memoryCoords
+    ? JSON.parse(memoryCoords)
+    : DemoApp.requestLocation();
+  if (userCoords && !memoryCoords) {
+    localStorage.setItem("userCoords", JSON.stringify(userCoords));
+  } else userCoords = { latitude: 41.311081, longitude: 69.240562 };
 
   ymaps.ready(init);
 
@@ -261,7 +264,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "map",
     ]);
 
-    // const regions = await getRegions();
+    const regions = await getRegions();
 
     const selectedRegion = event.target.value;
 
@@ -494,21 +497,12 @@ const DemoApp = {
   // Permissions
   requestLocation() {
     // added to localStorage not to ask permission for coords everytime
-    const memorizedCoords = localStorage.getItem("user-coords");
-    if (memorizedCoords) {
-      try {
-        const parsedMemorizedCoords = JSON.parse(memorizedCoords);
-        return parsedMemorizedCoords;
-      } catch (error) {}
-    } else {
-      if (navigator.geolocation) {
-        return navigator.geolocation.getCurrentPosition((position) => {
-          localStorage.setItem("user-coords", JSON.stringify(position.coords));
-          return position.coords;
-        });
-      }
-      return undefined;
+    if (navigator.geolocation) {
+      return navigator.geolocation.getCurrentPosition((position) => {
+        return position.coords;
+      });
     }
+    return undefined;
   },
 
   // Other

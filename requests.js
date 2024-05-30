@@ -1,5 +1,3 @@
-const axios = require("axios");
-
 axios.defaults.baseURL = config.baseUrl;
 
 const getZones = async () => await getData("/zones");
@@ -25,7 +23,7 @@ const getData = async (url) => {
   }
 };
 
-module.exports = {
+export {
   getZones,
   getRegions,
   getCities,
