@@ -51,7 +51,7 @@ const validatePhone = () => {
 const validateInn = () => {
   const innInput = document.getElementById("inn-input");
   const errorTag = innInput.nextElementSibling;
-  if (innInput.value.length < 10) {
+  if (innInput.value.length < 11) {
     errorTag.textContent = "*Введите корректный ИНН";
     return false;
   }
@@ -63,7 +63,7 @@ const validateAddress = () => {
   const addressInput = document.getElementById("address-input");
   const errorTag = addressInput.nextElementSibling;
   if (addressInput.value.length < 5) {
-    errorTag.textContent = "*Обязательное поле";
+    errorTag.textContent = "*Минимум 5 символов";
     return false;
   }
   errorTag.textContent = null;
@@ -74,7 +74,7 @@ const validateName = () => {
   const nameInput = document.getElementById("name-input");
   const errorTag = nameInput.nextElementSibling;
   if (nameInput.value.length < 5) {
-    errorTag.textContent = "*Обязательное поле";
+    errorTag.textContent = "*Минимум 5 символов";
     return false;
   }
   errorTag.textContent = null;
@@ -83,9 +83,10 @@ const validateName = () => {
 
 const validateLegalName = () => {
   const legalNameInput = document.getElementById("legal-name-input");
+  legalNameInput.value = innInput.value.toUpperCase();
   const errorTag = legalNameInput.nextElementSibling;
   if (legalNameInput.value.length < 5) {
-    errorTag.textContent = "*Обязательное поле";
+    errorTag.textContent = "*Минимум 5 символов";
     return false;
   }
   errorTag.textContent = null;
@@ -96,7 +97,7 @@ const validateReferencePoint = () => {
   const referenceInput = document.getElementById("reference-input");
   const errorTag = referenceInput.nextElementSibling;
   if (referenceInput.value.length < 5) {
-    errorTag.textContent = "*Обязательное поле";
+    errorTag.textContent = "*Минимум 5 символов";
     return false;
   }
   errorTag.textContent = null;
@@ -152,53 +153,6 @@ window.addEventListener("load", function () {
 document.addEventListener("DOMContentLoaded", () => {
   const formContent = document.getElementById("addForm");
 
-  // Data for regions and cities
-  const data = {
-    zones: {
-      zone1: {
-        uzb: "Uzbekistan",
-        russian: "Rossiya",
-        japan: "Yaponiya",
-        korea: "Korea",
-      },
-      zone2: {
-        franch: "Fransiya",
-        german: "Germaniya",
-        italy: "Italiya",
-        spain: "Ispaniya",
-      },
-      zone3: {
-        brasil: "Braziliya",
-        paraguay: "Paragvay",
-        chili: "Chili",
-        mexico: "Mexio",
-      },
-    },
-
-    regions: {
-      uzb: {
-        and: "Andijon",
-        fer: "Farg'ona",
-        nam: "Namangan",
-      },
-      russian: {
-        cros: "Кроснодар",
-        mos: "Москва",
-        arh: "Архан",
-      },
-      japan: {
-        tokyo: "Tokyo",
-        osaka: "Osaka",
-        hiroshima: "Hiroshima",
-      },
-      korea: {
-        seoul: "Seoul",
-        busan: "Busan",
-        daegu: "Daegu",
-      },
-    },
-  };
-
   // Utility function to remove elements by their IDs
   const removeElementsById = (ids) => {
     ids.forEach((id) => {
@@ -218,10 +172,10 @@ document.addEventListener("DOMContentLoaded", () => {
     select.id = id;
     select.required = true;
     select.innerHTML = `<option disabled selected required>${placeholder}</option>`;
-    Object.entries(options).forEach(([value, name]) => {
+    options.forEach((item) => {
       const option = document.createElement("option");
-      option.value = value;
-      option.textContent = name;
+      option.value = item.id;
+      option.textContent = item.name;
       select.appendChild(option);
     });
     selectContent.appendChild(label);
@@ -244,7 +198,20 @@ document.addEventListener("DOMContentLoaded", () => {
     const selectedZone = event.target.value;
     const regionSelect = createSelectElement(
       "region",
-      data.zones[selectedZone],
+      [
+        {
+          id: "93ff3da6-7975-4398-8420-56cff0ad9a4e",
+          name: "Region 1",
+          region_id: "5b0828ca-88c4-4a5f-8d48-f56e8863c366",
+          region_name: null,
+        },
+        {
+          id: "0c061f10-5d86-42bf-83e7-894cabe809v2",
+          name: "Region 2",
+          region_id: "5b0828ca-88c4-4a5f-8d48-f56e8863c377",
+          region_name: null,
+        },
+      ],
       "Region",
       "Regionni tanlang"
     );
@@ -270,7 +237,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const citySelect = createSelectElement(
       "city",
-      data.regions[selectedRegion],
+      [
+        {
+          id: "93ff3da6-7975-4398-8420-56cff0ad9a3d",
+          name: "BESHARIK",
+          region_id: "5b0828ca-88c4-4a5f-8d48-f56e8863c344",
+          region_name: null,
+        },
+        {
+          id: "0c061f10-5d86-42bf-83e7-894cabe809c6",
+          name: "YAYPAN",
+          region_id: "5b0828ca-88c4-4a5f-8d48-f56e8863c344",
+          region_name: null,
+        },
+      ],
       "Shahar",
       "Shaharni tanlang"
     );
@@ -292,7 +272,20 @@ document.addEventListener("DOMContentLoaded", () => {
     ]);
     const formatSelect = createSelectElement(
       "format",
-      { format1: "Format 1", format2: "Format 2", format3: "Format 3" },
+      [
+        {
+          id: "93ff3da6-7975-4398-8420-56cff0ad9a31",
+          name: "Format-1",
+          region_id: "5b0828ca-88c4-4a5f-8d48-f56e8863c341",
+          region_name: null,
+        },
+        {
+          id: "0c061f10-5d86-42bf-83e7-894cabe809c62",
+          name: "Format-2",
+          region_id: "5b0828ca-88c4-4a5f-8d48-f56e8863c342",
+          region_name: null,
+        },
+      ],
       "Format",
       "Formatni tanlang"
     );
@@ -305,11 +298,20 @@ document.addEventListener("DOMContentLoaded", () => {
     removeElementsById(["inputs", "category", "channel", "type", "map"]);
     const categorySelect = createSelectElement(
       "category",
-      {
-        category1: "Category 1",
-        category2: "Category 2",
-        category3: "Category 3",
-      },
+      [
+        {
+          id: "93ff3da6-7975-4398-8420-56cff0ad9a3d4",
+          name: "Category A",
+          region_id: "5b0828ca-88c4-4a5f-8d48-f56e8863c343",
+          region_name: null,
+        },
+        {
+          id: "0c061f10-5d86-42bf-83e7-894cabe809c5",
+          name: "Category B",
+          region_id: "5b0828ca-88c4-4a5f-8d48-f56e8863c349",
+          region_name: null,
+        },
+      ],
       "Category",
       "Categoryni tanlang"
     );
@@ -322,7 +324,20 @@ document.addEventListener("DOMContentLoaded", () => {
     removeElementsById(["inputs", "channel", "type", "map"]);
     const channelSelect = createSelectElement(
       "channel",
-      { channel1: "Channel 1", channel2: "Channel 2", channel3: "Channel 3" },
+      [
+        {
+          id: "93ff3da6-7975-4398-8420-56cff0ad9a3d",
+          name: "Cahnnel A",
+          region_id: "5b0828ca-88c4-4a5f-8d48-f56e8863c344",
+          region_name: null,
+        },
+        {
+          id: "0c061f10-5d86-42bf-83e7-894cabe809c9",
+          name: "Cahnnel B",
+          region_id: "5b0828ca-88c4-4a5f-8d48-f56e8863c347",
+          region_name: null,
+        },
+      ],
       "Channel",
       "Channelni tanlang"
     );
@@ -335,7 +350,20 @@ document.addEventListener("DOMContentLoaded", () => {
     removeElementsById(["inputs", "type", "map"]);
     const typeSelect = createSelectElement(
       "type",
-      { type1: "Type 1", type2: "Type 2", type3: "Type 3" },
+      [
+        {
+          id: "93ff3da6-7975-4398-8420-56cff0ad9a1a",
+          name: "Type 1",
+          region_id: "5b0828ca-88c4-4a5f-8d48-f56e8863c378",
+          region_name: null,
+        },
+        {
+          id: "0c061f10-5d86-42bf-83e7-894cabe809d2",
+          name: "Type 2",
+          region_id: "5b0828ca-88c4-4a5f-8d48-f56e8863c355",
+          region_name: null,
+        },
+      ],
       "Type",
       "Typeni tanlang"
     );
@@ -361,7 +389,7 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
       <div style="position: relative">
         <label for="phone-input">Телефон</label>
-        <input type="tel" name="phone" pattern="\\+\\d{3} \\(\\d{2}\\) \\d{3}-\\d{2}-\\d{2}" required id="phone-input" class="text-input" placeholder="Телефон" />
+        <input type="tel" name="phone" required id="phone-input" class="text-input" placeholder="Телефон" />
 
         <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
       </div>
@@ -380,7 +408,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <input type="text" required name="reference_point" id="reference-input" class="text-input" placeholder="Ориентир" />
         <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
       </div>
-      <div id="map"></div>
+      <div id="map" style="nargin-top: 12px"></div>
       <button style="visibility: hidden" type="submit" name="submit" id="submit-btn">Saqlash</button>`;
     formContent.appendChild(inputsDiv);
 
@@ -392,6 +420,22 @@ document.addEventListener("DOMContentLoaded", () => {
       mask: "+{998} (00) 000-00-00",
     });
     IMask(document.getElementById("inn-input"), { mask: "000 000 000" });
+    document.getElementById("inn-input").addEventListener("input", validateInn);
+    document
+      .getElementById("phone-input")
+      .addEventListener("input", validatePhone);
+    document
+      .getElementById("name-input")
+      .addEventListener("input", validateName);
+    document
+      .getElementById("legal-name-input")
+      .addEventListener("input", validateLegalName);
+    document
+      .getElementById("address-input")
+      .addEventListener("input", validateAddress);
+    document
+      .getElementById("reference-input")
+      .addEventListener("input", validateReferencePoint);
   };
 
   formContent.addEventListener("submit", (event) => {
@@ -406,6 +450,20 @@ document.addEventListener("DOMContentLoaded", () => {
       DemoApp.close();
     }
   });
+  document.getElementById("inn-input").addEventListener("input", validateInn);
+  document
+    .getElementById("phone-input")
+    .addEventListener("input", validatePhone);
+  document.getElementById("name-input").addEventListener("input", validateName);
+  document
+    .getElementById("legal-name-input")
+    .addEventListener("input", validateLegalName);
+  document
+    .getElementById("address-input")
+    .addEventListener("input", validateAddress);
+  document
+    .getElementById("reference-input")
+    .addEventListener("input", validateReferencePoint);
 
   // Initial event listener for the 'zone' select element
   document.getElementById("zone").addEventListener("change", handleZoneChange);
