@@ -1,11 +1,15 @@
-import { getRegions } from "./requests.js";
+import {
+  getZones,
+  getRegionsByZoneId,
+  getCitiesByRegionId,
+  getFormats,
+  getCategories,
+  getChannels,
+  getTypes,
+  postClient,
+} from "./requests.js";
 
 let selectedLocation = null;
-
-const onClickSubmitBtn = () => {
-  const submitBtn = document.getElementById("submit-btn");
-  submitBtn.click();
-};
 
 // validations
 const isValidForm = () => {
@@ -83,7 +87,7 @@ const validateName = () => {
 
 const validateLegalName = () => {
   const legalNameInput = document.getElementById("legal-name-input");
-  legalNameInput.value = innInput.value.toUpperCase();
+  legalNameInput.value = legalNameInput.value.toUpperCase();
   const errorTag = legalNameInput.nextElementSibling;
   if (legalNameInput.value.length < 5) {
     errorTag.textContent = "*Минимум 5 символов";
@@ -102,6 +106,63 @@ const validateReferencePoint = () => {
   }
   errorTag.textContent = null;
   return true;
+};
+
+const validateOnInput = () => {
+  document.getElementById("inn-input").addEventListener("input", validateInn);
+  document
+    .getElementById("phone-input")
+    .addEventListener("input", validatePhone);
+  document.getElementById("name-input").addEventListener("input", validateName);
+  document
+    .getElementById("legal-name-input")
+    .addEventListener("input", validateLegalName);
+  document
+    .getElementById("address-input")
+    .addEventListener("input", validateAddress);
+  document
+    .getElementById("reference-input")
+    .addEventListener("input", validateReferencePoint);
+};
+
+const onClickSubmitBtn = () => {
+  const submitBtn = document.getElementById("submit-btn");
+  submitBtn.click();
+};
+
+const onPostClient = async (_data) => {
+  const latitude = selectedLocation[0];
+  const longitude = selectedLocation[1];
+  const {
+    channel,
+    category,
+    city,
+    format,
+    type,
+    address,
+    company_name,
+    inn,
+    name,
+    navigate,
+    phone,
+  } = _data;
+  const data = {
+    address,
+    company_name,
+    inn,
+    name,
+    navigate,
+    phone,
+    latitude,
+    longitude,
+    sales_channel_id: channel,
+    client_category_id: category,
+    city_id: city,
+    format_id: format,
+    client_type_id: type,
+  };
+
+  await postClient(data);
 };
 
 // yandex map
@@ -150,7 +211,21 @@ window.addEventListener("load", function () {
   DemoApp.init();
 });
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  const onCreateZoneOptions = async () => {
+    const zoneSelect = document.getElementById("zone");
+    const zones = (await getZones()) || [];
+
+    zones.forEach((zone) => {
+      const option = document.createElement("option");
+      option.value = zone.id;
+      option.textContent = zone.name;
+      zoneSelect.appendChild(option);
+    });
+  };
+
+  await onCreateZoneOptions();
+
   const formContent = document.getElementById("addForm");
 
   // Utility function to remove elements by their IDs
@@ -171,7 +246,9 @@ document.addEventListener("DOMContentLoaded", () => {
     select.name = id;
     select.id = id;
     select.required = true;
-    select.innerHTML = `<option disabled selected required>${placeholder}</option>`;
+    select.innerHTML = `<option disabled selected required>${
+      options.length ? placeholder : "Нет данных"
+    }</option>`;
     options.forEach((item) => {
       const option = document.createElement("option");
       option.value = item.id;
@@ -184,7 +261,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Function to handle zone selection
-  const handleZoneChange = (event) => {
+  const handleZoneChange = async (event) => {
     removeElementsById([
       "region",
       "city",
@@ -195,26 +272,19 @@ document.addEventListener("DOMContentLoaded", () => {
       "type",
       "map",
     ]);
-    const selectedZone = event.target.value;
+
+    createLoader();
+    const selectedZoneId = event.target.value;
+    const regions = await getRegionsByZoneId(selectedZoneId);
+    removeLoader();
+
     const regionSelect = createSelectElement(
       "region",
-      [
-        {
-          id: "93ff3da6-7975-4398-8420-56cff0ad9a4e",
-          name: "Region 1",
-          region_id: "5b0828ca-88c4-4a5f-8d48-f56e8863c366",
-          region_name: null,
-        },
-        {
-          id: "0c061f10-5d86-42bf-83e7-894cabe809v2",
-          name: "Region 2",
-          region_id: "5b0828ca-88c4-4a5f-8d48-f56e8863c377",
-          region_name: null,
-        },
-      ],
-      "Region",
-      "Regionni tanlang"
+      regions,
+      "Регион",
+      "Выберите регион"
     );
+
     regionSelect.addEventListener("change", handleRegionChange);
     formContent.appendChild(regionSelect);
   };
@@ -231,28 +301,18 @@ document.addEventListener("DOMContentLoaded", () => {
       "map",
     ]);
 
-    const regions = await getRegions();
+    createLoader();
+    const selectedRegionId = event.target.value;
+    const cities = await getCitiesByRegionId(selectedRegionId);
+    removeLoader();
 
     const selectedRegion = event.target.value;
 
     const citySelect = createSelectElement(
       "city",
-      [
-        {
-          id: "93ff3da6-7975-4398-8420-56cff0ad9a3d",
-          name: "BESHARIK",
-          region_id: "5b0828ca-88c4-4a5f-8d48-f56e8863c344",
-          region_name: null,
-        },
-        {
-          id: "0c061f10-5d86-42bf-83e7-894cabe809c6",
-          name: "YAYPAN",
-          region_id: "5b0828ca-88c4-4a5f-8d48-f56e8863c344",
-          region_name: null,
-        },
-      ],
-      "Shahar",
-      "Shaharni tanlang"
+      cities,
+      "Город",
+      "Выберите город"
     );
 
     citySelect.addEventListener("change", handleCityChange);
@@ -261,7 +321,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // Function to handle city selection
-  const handleCityChange = () => {
+  const handleCityChange = async () => {
     removeElementsById([
       "inputs",
       "format",
@@ -270,102 +330,66 @@ document.addEventListener("DOMContentLoaded", () => {
       "type",
       "map",
     ]);
+
+    createLoader();
+    const formats = await getFormats();
+    removeLoader();
+
     const formatSelect = createSelectElement(
       "format",
-      [
-        {
-          id: "93ff3da6-7975-4398-8420-56cff0ad9a31",
-          name: "Format-1",
-          region_id: "5b0828ca-88c4-4a5f-8d48-f56e8863c341",
-          region_name: null,
-        },
-        {
-          id: "0c061f10-5d86-42bf-83e7-894cabe809c62",
-          name: "Format-2",
-          region_id: "5b0828ca-88c4-4a5f-8d48-f56e8863c342",
-          region_name: null,
-        },
-      ],
-      "Format",
-      "Formatni tanlang"
+      formats,
+      "Формат",
+      "Выберите формат"
     );
     formatSelect.addEventListener("change", handleFormatChange);
     formContent.appendChild(formatSelect);
   };
 
   // Function to handle format selection
-  const handleFormatChange = () => {
+  const handleFormatChange = async () => {
     removeElementsById(["inputs", "category", "channel", "type", "map"]);
+    createLoader();
+    const categories = await getCategories();
+    removeLoader();
     const categorySelect = createSelectElement(
       "category",
-      [
-        {
-          id: "93ff3da6-7975-4398-8420-56cff0ad9a3d4",
-          name: "Category A",
-          region_id: "5b0828ca-88c4-4a5f-8d48-f56e8863c343",
-          region_name: null,
-        },
-        {
-          id: "0c061f10-5d86-42bf-83e7-894cabe809c5",
-          name: "Category B",
-          region_id: "5b0828ca-88c4-4a5f-8d48-f56e8863c349",
-          region_name: null,
-        },
-      ],
-      "Category",
-      "Categoryni tanlang"
+      categories,
+      "Категория",
+      "Выберите категорю"
     );
     categorySelect.addEventListener("change", handleCategoryChange);
     formContent.appendChild(categorySelect);
   };
 
   // Function to handle category selection
-  const handleCategoryChange = () => {
+  const handleCategoryChange = async () => {
     removeElementsById(["inputs", "channel", "type", "map"]);
+
+    createLoader();
+    const channels = await getChannels();
+    removeLoader();
     const channelSelect = createSelectElement(
       "channel",
-      [
-        {
-          id: "93ff3da6-7975-4398-8420-56cff0ad9a3d",
-          name: "Cahnnel A",
-          region_id: "5b0828ca-88c4-4a5f-8d48-f56e8863c344",
-          region_name: null,
-        },
-        {
-          id: "0c061f10-5d86-42bf-83e7-894cabe809c9",
-          name: "Cahnnel B",
-          region_id: "5b0828ca-88c4-4a5f-8d48-f56e8863c347",
-          region_name: null,
-        },
-      ],
-      "Channel",
-      "Channelni tanlang"
+      channels,
+      "Канал",
+      "Выберите канал"
     );
     channelSelect.addEventListener("change", handleChannelChange);
     formContent.appendChild(channelSelect);
   };
 
   // Function to handle channel selection
-  const handleChannelChange = () => {
+  const handleChannelChange = async () => {
     removeElementsById(["inputs", "type", "map"]);
+
+    createLoader();
+    const types = await getTypes();
+    removeLoader();
     const typeSelect = createSelectElement(
       "type",
-      [
-        {
-          id: "93ff3da6-7975-4398-8420-56cff0ad9a1a",
-          name: "Type 1",
-          region_id: "5b0828ca-88c4-4a5f-8d48-f56e8863c378",
-          region_name: null,
-        },
-        {
-          id: "0c061f10-5d86-42bf-83e7-894cabe809d2",
-          name: "Type 2",
-          region_id: "5b0828ca-88c4-4a5f-8d48-f56e8863c355",
-          region_name: null,
-        },
-      ],
-      "Type",
-      "Typeni tanlang"
+      types,
+      "Тип",
+      "Выберите тип"
     );
     typeSelect.addEventListener("change", handleTypeChange);
     formContent.appendChild(typeSelect);
@@ -384,7 +408,7 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
         <div style="position: relative">
         <label for="legal-name-input">Юридическое названия</label>
-        <input type="text" required name="legal_name" id="legal-name-input" class="text-input" placeholder="Юридическое название" />
+        <input type="text" required name="company_name" id="legal-name-input" class="text-input" placeholder="Юридическое название" />
         <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
       </div>
       <div style="position: relative">
@@ -405,7 +429,7 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
       <div style="position: relative">
         <label for="reference-input">Ориентир</label>
-        <input type="text" required name="reference_point" id="reference-input" class="text-input" placeholder="Ориентир" />
+        <input type="text" required name="navigate" id="reference-input" class="text-input" placeholder="Ориентир" />
         <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
       </div>
       <div id="map" style="nargin-top: 12px"></div>
@@ -420,50 +444,41 @@ document.addEventListener("DOMContentLoaded", () => {
       mask: "+{998} (00) 000-00-00",
     });
     IMask(document.getElementById("inn-input"), { mask: "000 000 000" });
-    document.getElementById("inn-input").addEventListener("input", validateInn);
-    document
-      .getElementById("phone-input")
-      .addEventListener("input", validatePhone);
-    document
-      .getElementById("name-input")
-      .addEventListener("input", validateName);
-    document
-      .getElementById("legal-name-input")
-      .addEventListener("input", validateLegalName);
-    document
-      .getElementById("address-input")
-      .addEventListener("input", validateAddress);
-    document
-      .getElementById("reference-input")
-      .addEventListener("input", validateReferencePoint);
+    validateOnInput();
   };
 
-  formContent.addEventListener("submit", (event) => {
-    event.preventDefault();
-    if (isValidForm()) {
-      const formData = new FormData(event.target);
-      const data = {};
-      formData.forEach((value, key) => {
-        data[key] = value;
-      });
-      DemoApp.sendNotification("Operation successful!");
-      DemoApp.close();
-    }
-  });
-  document.getElementById("inn-input").addEventListener("input", validateInn);
-  document
-    .getElementById("phone-input")
-    .addEventListener("input", validatePhone);
-  document.getElementById("name-input").addEventListener("input", validateName);
-  document
-    .getElementById("legal-name-input")
-    .addEventListener("input", validateLegalName);
-  document
-    .getElementById("address-input")
-    .addEventListener("input", validateAddress);
-  document
-    .getElementById("reference-input")
-    .addEventListener("input", validateReferencePoint);
+  // Create loader
+  const createLoader = () => {
+    const formContent = document.getElementById("addForm");
+    const loader = document.createElement("div");
+    loader.className = "loader";
+    formContent.appendChild(loader);
+  };
+
+  const removeLoader = () => {
+    const loader = document.querySelector(".loader");
+    if (loader) loader.remove();
+  };
+
+  const onSubmit = () => {
+    formContent.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (isValidForm()) {
+        DemoApp.MainButton.isProgressVisible = true;
+        const data = {};
+        const formData = new FormData(event.target);
+        formData.forEach((value, key) => {
+          data[key] = value;
+        });
+        await onPostClient(data);
+        DemoApp.MainButton.isProgressVisible = false;
+        DemoApp.sendConfirmationToAddAgain("Хотите добавить еще?");
+        DemoApp.close();
+      }
+    });
+  };
+
+  onSubmit();
 
   // Initial event listener for the 'zone' select element
   document.getElementById("zone").addEventListener("change", handleZoneChange);
@@ -481,7 +496,7 @@ const DemoApp = {
     document.body.style.visibility = "";
     Telegram.WebApp.ready();
     Telegram.WebApp.MainButton.setParams({
-      text: "Подать",
+      text: "Добавить",
       is_visible: true,
     }).onClick(onClickSubmitBtn);
   },
@@ -501,8 +516,8 @@ const DemoApp = {
     );
   },
 
-  sendNotification(message) {
-    Telegram.WebApp.showAlert(message);
+  sendConfirmationToAddAgain(message) {
+    Telegram.WebApp.showConfirm(message);
   },
 
   sendMessage(msg_id, with_webview) {
