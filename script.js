@@ -83,7 +83,7 @@ const validateName = () => {
 
 const validateLegalName = () => {
   const legalNameInput = document.getElementById("legal-name-input");
-  legalNameInput.value = innInput.value.toUpperCase();
+  legalNameInput.value = legalNameInput.value.toUpperCase();
   const errorTag = legalNameInput.nextElementSibling;
   if (legalNameInput.value.length < 5) {
     errorTag.textContent = "*Минимум 5 символов";
