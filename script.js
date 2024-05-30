@@ -464,14 +464,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     formContent.addEventListener("submit", async (event) => {
       event.preventDefault();
       if (isValidForm()) {
-        DemoApp.MainButton.isProgressVisible = true;
+        DemoApp.showMainButtonLoader()
         const data = {};
         const formData = new FormData(event.target);
         formData.forEach((value, key) => {
           data[key] = value;
         });
         await onPostClient(data);
-        DemoApp.MainButton.isProgressVisible = false;
+        DemoApp.hideMainButtonLoader
         DemoApp.sendConfirmationToAddAgain("Хотите добавить еще?");
         DemoApp.close();
       }
@@ -503,6 +503,14 @@ const DemoApp = {
 
   close() {
     Telegram.WebApp.close();
+  },
+
+  showMainButtonLoader(leaveBtnActive = false) {
+    Telegram.WebApp.showProgress(leaveBtnActive)
+  },
+
+  hideMainButtonLoader() {
+    Telegram.WebApp.hideProgress()
   },
 
   // actions
