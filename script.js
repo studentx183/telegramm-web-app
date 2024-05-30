@@ -450,20 +450,6 @@ document.addEventListener("DOMContentLoaded", () => {
       DemoApp.close();
     }
   });
-  document.getElementById("inn-input").addEventListener("input", validateInn);
-  document
-    .getElementById("phone-input")
-    .addEventListener("input", validatePhone);
-  document.getElementById("name-input").addEventListener("input", validateName);
-  document
-    .getElementById("legal-name-input")
-    .addEventListener("input", validateLegalName);
-  document
-    .getElementById("address-input")
-    .addEventListener("input", validateAddress);
-  document
-    .getElementById("reference-input")
-    .addEventListener("input", validateReferencePoint);
 
   // Initial event listener for the 'zone' select element
   document.getElementById("zone").addEventListener("change", handleZoneChange);
