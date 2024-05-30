@@ -506,11 +506,11 @@ const DemoApp = {
   },
 
   showMainButtonLoader(leaveBtnActive = false) {
-    Telegram.WebApp.showProgress(leaveBtnActive)
+    Telegram.WebApp.MainButton.showProgress(leaveBtnActive)
   },
 
   hideMainButtonLoader() {
-    Telegram.WebApp.hideProgress()
+    Telegram.WebApp.MainButton.hideProgress()
   },
 
   // actions
