@@ -1,4 +1,4 @@
-import { getRegions } from "./requests.js"
+import { getRegions } from "./requests.js";
 
 let selectedLocation = null;
 
@@ -361,7 +361,8 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
       <div style="position: relative">
         <label for="phone-input">Телефон</label>
-        <input type="text" required name="phone" id="phone-input" class="text-input" placeholder="Телефон" />
+        <input type="tel" name="phone" pattern="\\+\\d{3} \\(\\d{2}\\) \\d{3}-\\d{2}-\\d{2}" required id="phone-input" class="text-input" placeholder="Телефон" />
+
         <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
       </div>
       <div style="position: relative">
