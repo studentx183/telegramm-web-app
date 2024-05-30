@@ -1,18 +1,22 @@
 axios.defaults.baseURL = config.baseUrl;
 
-const getZones = async () => await getData("/zones");
+const getZones = async () => await getData("/zone/list");
 
-const getRegions = async () => await getData("/regions");
+const getRegionsByZoneId = async (zoneId) =>
+  await getData(`/region/list/by-zoneId?zoneId=${zoneId}`);
 
-const getCities = async () => await getData("/cities");
+const getCitiesByRegionId = async (regionId) =>
+  await getData(`/city/list/by-regionId?regionId=${regionId}`);
 
-const getFormats = async () => await getData("/formats");
+const getFormats = async () => await getData("/format/list");
 
-const getCategories = async () => await getData("/categories");
+const getCategories = async () => await getData("/client-category/list");
 
-const getChannels = async () => await getData("/channels");
+const getChannels = async () => await getData("/sales-channel/list");
 
-const getTypes = async () => await getData("/types");
+const getTypes = async () => await getData("/client-type/list");
+
+const postClient = async (data) => await postData("/client/create", data);
 
 const getData = async (url) => {
   try {
@@ -23,12 +27,22 @@ const getData = async (url) => {
   }
 };
 
+const postData = async (url, data) => {
+  try {
+    const response = await axios.post(url, data);
+    return response;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export {
   getZones,
-  getRegions,
-  getCities,
+  getRegionsByZoneId,
+  getCitiesByRegionId,
   getFormats,
   getCategories,
   getChannels,
   getTypes,
+  postClient,
 };
