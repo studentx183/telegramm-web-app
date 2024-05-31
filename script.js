@@ -13,6 +13,7 @@ let selectedLocation = null;
 
 // validations
 const isValidForm = () => {
+  const isValidAgentCode = validateAgentCode();
   const isNameValid = validateName();
   const isPhoneValid = validatePhone();
   const isInnValid = validateInn();
@@ -22,6 +23,7 @@ const isValidForm = () => {
   const submitBtn = document.getElementById("submit-btn");
 
   if (
+    !isValidAgentCode ||
     !isNameValid ||
     !isPhoneValid ||
     !isInnValid ||
@@ -39,6 +41,18 @@ const isValidForm = () => {
     return false;
   }
   return true;
+};
+
+const validateAgentCode = () => {
+  const agentCodeInput = document.getElementById("agent-code-input");
+  agentCodeInput.value = agentCodeInput.value.toUpperCase();
+  const errorTag = agentCodeInput.nextElementSibling;
+  if (agentCodeInput.value.length < 3) {
+    errorTag.textContent = "*Минимум 3 символов";
+    return false;
+  }
+  errorTag.textContent = null;
+  return true
 };
 
 const validatePhone = () => {
@@ -108,7 +122,7 @@ const validateReferencePoint = () => {
   return true;
 };
 
-const validateOnInput = () => {
+const validateInfoInputs = () => {
   document.getElementById("inn-input").addEventListener("input", validateInn);
   document
     .getElementById("phone-input")
@@ -123,6 +137,16 @@ const validateOnInput = () => {
   document
     .getElementById("reference-input")
     .addEventListener("input", validateReferencePoint);
+};
+
+const validateAgentCodeInput = () => {
+  const agentCodeInput = document.getElementById("agent-code-input");
+  agentCodeInput.addEventListener("input", validateAgentCode);
+}
+
+const resetForm = () => {
+  const formContent = document.getElementById("addForm");
+  formContent.reset();
 };
 
 const onClickSubmitBtn = () => {
@@ -145,7 +169,9 @@ const onPostClient = async (_data) => {
     name,
     navigate,
     phone,
+    agent_code,
   } = _data;
+
   const data = {
     address,
     company_name,
@@ -153,6 +179,7 @@ const onPostClient = async (_data) => {
     name,
     navigate,
     phone,
+    agent_code,
     latitude,
     longitude,
     sales_channel_id: channel,
@@ -160,9 +187,11 @@ const onPostClient = async (_data) => {
     city_id: city,
     format_id: format,
     client_type_id: type,
+    user_info: DemoApp.initDataUnsafe,
   };
 
-  await postClient(data);
+  const response = await postClient(data);
+  return response;
 };
 
 // yandex map
@@ -207,15 +236,17 @@ const initYandexMap = () => {
   }
 };
 
-window.addEventListener("load", function () {
-  DemoApp.init();
-});
+window.addEventListener("load", () => DemoApp.init());
 
 document.addEventListener("DOMContentLoaded", async () => {
+  const formContent = document.getElementById("addForm");
+  validateAgentCodeInput();
+
+  // create options for zone-select
   const onCreateZoneOptions = async () => {
     const zoneSelect = document.getElementById("zone");
     const zones = (await getZones()) || [];
-
+    
     zones.forEach((zone) => {
       const option = document.createElement("option");
       option.value = zone.id;
@@ -223,10 +254,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       zoneSelect.appendChild(option);
     });
   };
-
   await onCreateZoneOptions();
-
-  const formContent = document.getElementById("addForm");
+  
 
   // Utility function to remove elements by their IDs
   const removeElementsById = (ids) => {
@@ -246,9 +275,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     select.name = id;
     select.id = id;
     select.required = true;
-    select.innerHTML = `<option disabled selected required>${
-      options.length ? placeholder : "Нет данных"
-    }</option>`;
+    select.innerHTML = `<option disabled selected required>${options.length ? placeholder : "Нет данных"
+      }</option>`;
     options.forEach((item) => {
       const option = document.createElement("option");
       option.value = item.id;
@@ -259,6 +287,47 @@ document.addEventListener("DOMContentLoaded", async () => {
     selectContent.appendChild(select);
     return selectContent;
   };
+
+  // create client-info inputs
+  const createInfoInputs = () => {
+    const inputsDiv = document.createElement("div");
+    inputsDiv.id = "inputs";
+    inputsDiv.innerHTML = `
+      <div style="position: relative">
+        <label for="name-input">Названия</label>
+        <input type="text" required name="name" id="name-input" class="text-input" placeholder="Названия магазина" />
+        <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
+      </div>
+        <div style="position: relative">
+        <label for="legal-name-input">Юридическое названия</label>
+        <input type="text" required name="company_name" id="legal-name-input" class="text-input" placeholder="Юридическое название" />
+        <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
+      </div>
+      <div style="position: relative">
+        <label for="phone-input">Телефон</label>
+        <input type="tel" name="phone" required id="phone-input" class="text-input" placeholder="Телефон" />
+
+        <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
+      </div>
+      <div style="position: relative">
+        <label for="inn-input">Инн</label>
+        <input type="text" required name="inn" id="inn-input" class="text-input" placeholder="Инн" />
+        <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
+      </div>
+      <div style="position: relative">
+        <label for="address-input">Адрес</label>
+        <input type="text" required name="address" id="address-input" class="text-input" placeholder="Адрес" />
+        <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
+      </div>
+      <div style="position: relative">
+        <label for="reference-input">Ориентир</label>
+        <input type="text" required name="navigate" id="reference-input" class="text-input" placeholder="Ориентир" />
+        <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
+      </div>
+      <div id="map" style="nargin-top: 12px"></div>
+      <button style="visibility: hidden" type="submit" name="submit" id="submit-btn">Saqlash</button>`;
+    formContent.appendChild(inputsDiv);
+  }
 
   // Function to handle zone selection
   const handleZoneChange = async (event) => {
@@ -398,44 +467,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Function to handle type selection
   const handleTypeChange = () => {
     removeElementsById(["inputs"]);
-    const inputsDiv = document.createElement("div");
-    inputsDiv.id = "inputs";
-    inputsDiv.innerHTML = `
-      <div style="position: relative">
-        <label for="name-input">Названия</label>
-        <input type="text" required name="name" id="name-input" class="text-input" placeholder="Названия магазина" />
-        <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
-      </div>
-        <div style="position: relative">
-        <label for="legal-name-input">Юридическое названия</label>
-        <input type="text" required name="company_name" id="legal-name-input" class="text-input" placeholder="Юридическое название" />
-        <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
-      </div>
-      <div style="position: relative">
-        <label for="phone-input">Телефон</label>
-        <input type="tel" name="phone" required id="phone-input" class="text-input" placeholder="Телефон" />
-
-        <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
-      </div>
-      <div style="position: relative">
-        <label for="inn-input">Инн</label>
-        <input type="text" required name="inn" id="inn-input" class="text-input" placeholder="Инн" />
-        <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
-      </div>
-      <div style="position: relative">
-        <label for="address-input">Адрес</label>
-        <input type="text" required name="address" id="address-input" class="text-input" placeholder="Адрес" />
-        <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
-      </div>
-      <div style="position: relative">
-        <label for="reference-input">Ориентир</label>
-        <input type="text" required name="navigate" id="reference-input" class="text-input" placeholder="Ориентир" />
-        <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
-      </div>
-      <div id="map" style="nargin-top: 12px"></div>
-      <button style="visibility: hidden" type="submit" name="submit" id="submit-btn">Saqlash</button>`;
-    formContent.appendChild(inputsDiv);
-
+    createInfoInputs();
     // init yandex-maps
     initYandexMap();
 
@@ -444,7 +476,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       mask: "+{998} (00) 000-00-00",
     });
     IMask(document.getElementById("inn-input"), { mask: "000 000 000" });
-    validateOnInput();
+    validateInfoInputs();
   };
 
   // Create loader
@@ -470,10 +502,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         formData.forEach((value, key) => {
           data[key] = value;
         });
-        await onPostClient(data);
-        DemoApp.hideMainButtonLoader
-        DemoApp.sendConfirmationToAddAgain("Хотите добавить еще?");
-        DemoApp.close();
+        DemoApp.hideMainButtonLoader()
+        const response = await onPostClient(data);
+        if(response?.statusText === 'OK') {
+          DemoApp.sendConfirmationToAddAgain("Хотите добавить еще?");
+        } else {
+          alert("Ошибка при добавлении клиента");
+        }
       }
     });
   };
@@ -483,6 +518,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Initial event listener for the 'zone' select element
   document.getElementById("zone").addEventListener("change", handleZoneChange);
 });
+
+const handleAddAgainConfirmation = (isOkToAddAgain) => {
+  if (isOkToAddAgain) {
+    resetForm();
+  } else {
+    DemoApp.close();
+  }
+}
 
 // Telegram Web API
 const DemoApp = {
@@ -525,7 +568,9 @@ const DemoApp = {
   },
 
   sendConfirmationToAddAgain(message) {
-    Telegram.WebApp.showConfirm(message);
+    Telegram.WebApp.showConfirm(message, [isOkToAddAgain, () => {
+      handleAddAgainConfirmation(isOkToAddAgain)
+    }]);
   },
 
   sendMessage(msg_id, with_webview) {
