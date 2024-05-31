@@ -18,6 +18,9 @@ const getTypes = async () => await getData("/client-type/list");
 
 const postClient = async (data) => await postData("/client/create", data);
 
+const postRegistrationData = async (data) =>
+  await postData("/client/get-agent-code", data);
+
 const getData = async (url) => {
   try {
     const { data } = await axios.get(url);
@@ -45,4 +48,5 @@ export {
   getChannels,
   getTypes,
   postClient,
+  postRegistrationData,
 };
