@@ -7,9 +7,38 @@ import {
   getChannels,
   getTypes,
   postClient,
+  postRegistrationData,
 } from "./requests.js";
 
 let selectedLocation = null;
+
+// on-load DOM
+window.addEventListener("load", async () => {
+  DemoApp.init();
+  const agentCode = await getAgentCode();
+  setAgentCode(agentCode);
+});
+
+const getAgentCode = async () => {
+  // gets agent code from the backend by sending initDataUnsafe of Telegram
+  const userData = getModifiedUserObj();
+  if(!userData) return undefined;
+  const { data } = await postRegistrationData(userData);
+  return data || undefined;
+};
+
+const setAgentCode = (agentCode) => {
+  if (agentCode) {
+    const agentCodeInput = document.getElementById("agent-code-input");
+    agentCodeInput.value = agentCode;
+  }
+};
+
+const getModifiedUserObj = () => {
+  if (!Object.keys(DemoApp.initDataUnsafe || []).length) return undefined;
+  const { user_id, username, query_id, hash } = DemoApp.initDataUnsafe;
+  return { user_id, username, query_id, hash };
+};
 
 // validations
 const isValidForm = () => {
@@ -149,6 +178,7 @@ const resetForm = () => {
   formContent.reset();
 };
 
+// on-submit form
 const onClickSubmitBtn = () => {
   const submitBtn = document.getElementById("submit-btn");
   submitBtn.click();
@@ -187,7 +217,7 @@ const onPostClient = async (_data) => {
     city_id: city,
     format_id: format,
     client_type_id: type,
-    user_info: DemoApp.initDataUnsafe,
+    user_info: getModifiedUserObj(),
   };
 
   const response = await postClient(data);
@@ -235,8 +265,6 @@ const initYandexMap = () => {
     });
   }
 };
-
-window.addEventListener("load", () => DemoApp.init());
 
 document.addEventListener("DOMContentLoaded", async () => {
   const formContent = document.getElementById("addForm");
