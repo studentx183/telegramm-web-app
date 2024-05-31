@@ -623,7 +623,6 @@ const DemoApp = {
 
   // Permissions
   requestLocation() {
-    // added to localStorage not to ask permission for coords everytime
     if (navigator.geolocation) {
       return navigator.geolocation.getCurrentPosition((position) => {
         return position.coords;
