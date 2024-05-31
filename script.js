@@ -52,7 +52,7 @@ const validateAgentCode = () => {
     return false;
   }
   errorTag.textContent = null;
-  return true
+  return true;
 };
 
 const validatePhone = () => {
@@ -142,7 +142,7 @@ const validateInfoInputs = () => {
 const validateAgentCodeInput = () => {
   const agentCodeInput = document.getElementById("agent-code-input");
   agentCodeInput.addEventListener("input", validateAgentCode);
-}
+};
 
 const resetForm = () => {
   const formContent = document.getElementById("addForm");
@@ -246,7 +246,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const onCreateZoneOptions = async () => {
     const zoneSelect = document.getElementById("zone");
     const zones = (await getZones()) || [];
-    
+
     zones.forEach((zone) => {
       const option = document.createElement("option");
       option.value = zone.id;
@@ -255,7 +255,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   };
   await onCreateZoneOptions();
-  
 
   // Utility function to remove elements by their IDs
   const removeElementsById = (ids) => {
@@ -275,8 +274,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     select.name = id;
     select.id = id;
     select.required = true;
-    select.innerHTML = `<option disabled selected required>${options.length ? placeholder : "Нет данных"
-      }</option>`;
+    select.innerHTML = `<option disabled selected required>${
+      options.length ? placeholder : "Нет данных"
+    }</option>`;
     options.forEach((item) => {
       const option = document.createElement("option");
       option.value = item.id;
@@ -327,7 +327,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       <div id="map" style="nargin-top: 12px"></div>
       <button style="visibility: hidden" type="submit" name="submit" id="submit-btn">Saqlash</button>`;
     formContent.appendChild(inputsDiv);
-  }
+  };
 
   // Function to handle zone selection
   const handleZoneChange = async (event) => {
@@ -496,15 +496,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     formContent.addEventListener("submit", async (event) => {
       event.preventDefault();
       if (isValidForm()) {
-        DemoApp.showMainButtonLoader()
+        DemoApp.showMainButtonLoader();
         const data = {};
         const formData = new FormData(event.target);
         formData.forEach((value, key) => {
           data[key] = value;
         });
-        DemoApp.hideMainButtonLoader()
         const response = await onPostClient(data);
-        if(response?.statusText === 'OK') {
+        DemoApp.hideMainButtonLoader();
+        if (response?.statusText === "OK") {
           DemoApp.sendConfirmationToAddAgain("Хотите добавить еще?");
         } else {
           alert("Ошибка при добавлении клиента");
@@ -525,7 +525,7 @@ const handleAddAgainConfirmation = (isOkToAddAgain) => {
   } else {
     DemoApp.close();
   }
-}
+};
 
 // Telegram Web API
 const DemoApp = {
@@ -549,11 +549,11 @@ const DemoApp = {
   },
 
   showMainButtonLoader(leaveBtnActive = false) {
-    Telegram.WebApp.MainButton.showProgress(leaveBtnActive)
+    Telegram.WebApp.MainButton.showProgress(leaveBtnActive);
   },
 
   hideMainButtonLoader() {
-    Telegram.WebApp.MainButton.hideProgress()
+    Telegram.WebApp.MainButton.hideProgress();
   },
 
   // actions
@@ -568,9 +568,9 @@ const DemoApp = {
   },
 
   sendConfirmationToAddAgain(message) {
-    Telegram.WebApp.showConfirm(message, [isOkToAddAgain, () => {
+    Telegram.WebApp.showConfirm(message, (isOkToAddAgain) =>
       handleAddAgainConfirmation(isOkToAddAgain)
-    }]);
+    );
   },
 
   sendMessage(msg_id, with_webview) {
