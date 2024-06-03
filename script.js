@@ -20,11 +20,11 @@ window.addEventListener("load", async () => {
 });
 
 const getAgentCode = async () => {
-  // gets agent code from the backend by sending initDataUnsafe of Telegram
-  const userData = getModifiedUserObj();
+  // gets agent code from the backend by sending initDataUnsafe of Telegram.WebApp
+  const userData = DemoApp.initDataUnsafe;
   if(!userData) return undefined;
-  const { data } = await postRegistrationData(userData);
-  return data || undefined;
+  const { data: agentCode } = await postRegistrationData(userData);
+  return agentCode || undefined;
 };
 
 const setAgentCode = (agentCode) => {
@@ -32,12 +32,6 @@ const setAgentCode = (agentCode) => {
     const agentCodeInput = document.getElementById("agent-code-input");
     agentCodeInput.value = agentCode;
   }
-};
-
-const getModifiedUserObj = () => {
-  if (!Object.keys(DemoApp.initDataUnsafe || []).length) return undefined;
-  const { user_id, username, query_id, hash } = DemoApp.initDataUnsafe;
-  return { user_id, username, query_id, hash };
 };
 
 // validations
@@ -217,7 +211,7 @@ const onPostClient = async (_data) => {
     city_id: city,
     format_id: format,
     client_type_id: type,
-    user_info: getModifiedUserObj(),
+    user_info: DemoApp.initDataUnsafe,
   };
 
   const response = await postClient(data);
@@ -533,7 +527,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const response = await onPostClient(data);
         DemoApp.hideMainButtonLoader();
         if (response?.statusText === "OK") {
-          DemoApp.sendConfirmationToAddAgain("Хотите добавить еще?");
+          DemoApp.sendConfirmationToAddAgain("Клиент успешно добавлен!\nХотите добавить еще?");
         } else {
           alert("Ошибка при добавлении клиента");
         }
