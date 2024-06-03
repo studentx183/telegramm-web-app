@@ -22,7 +22,7 @@ window.addEventListener("load", async () => {
 const getAgentCode = async () => {
   // gets agent code from the backend by sending initDataUnsafe of Telegram.WebApp
   const userData = DemoApp.initDataUnsafe;
-  if(!userData) return undefined;
+  if (!userData) return undefined;
   const { data: agentCode } = await postRegistrationData(userData);
   return agentCode || undefined;
 };
@@ -181,6 +181,7 @@ const onClickSubmitBtn = () => {
 const onPostClient = async (_data) => {
   const latitude = selectedLocation[0];
   const longitude = selectedLocation[1];
+  const { query_id, hash } = DemoApp.initDataUnsafe;
   const {
     channel,
     category,
@@ -206,12 +207,13 @@ const onPostClient = async (_data) => {
     agent_code,
     latitude,
     longitude,
+    query_id,
+    hash,
     sales_channel_id: channel,
     client_category_id: category,
     city_id: city,
     format_id: format,
     client_type_id: type,
-    user_info: DemoApp.initDataUnsafe,
   };
 
   const response = await postClient(data);
@@ -527,7 +529,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         const response = await onPostClient(data);
         DemoApp.hideMainButtonLoader();
         if (response?.statusText === "OK") {
-          DemoApp.sendConfirmationToAddAgain("Клиент успешно добавлен!\nХотите добавить еще?");
+          DemoApp.sendConfirmationToAddAgain(
+            "Клиент успешно добавлен!\nХотите добавить еще?"
+          );
         } else {
           alert("Ошибка при добавлении клиента");
         }
