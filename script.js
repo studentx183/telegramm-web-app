@@ -44,7 +44,6 @@ const isValidForm = () => {
   const isLegalNameValid = validateLegalName();
   const isAddressValid = validateAddress();
   const isReferencePointValid = validateReferencePoint();
-  const submitBtn = document.getElementById("submit-btn");
 
   if (!isSelectBoxesValid) {
     alert("Выберите все поля");
@@ -67,9 +66,9 @@ const isValidForm = () => {
 };
 
 const validateEnteredValue = (element, value) => {
-  const regex = /^[a-zA-Z0-9_.-]*$/;
+  const regex = /^[a-zA-Z0-9_.-\s]*$/;
   if (!value.match(regex)) {
-    const sanitizedValue = value.replace(/[^a-zA-Z0-9_.-]/g, "");
+    const sanitizedValue = value.replace(/[^a-zA-Z0-9_.-\s]/g, "");
     element.value = sanitizedValue;
   }
 };
@@ -188,13 +187,13 @@ const validateAgentCodeOnInput = () => {
 };
 
 const validateSelectBoxes = () => {
-  const selectBoxes = document.querySelectorAll("select");
-  selectBoxes.forEach((selectBox) => {
-    if (selectBox.value === "false") {
-      return false;
+  const selectBoxes = Array.from(document.querySelectorAll("select"));
+  const isAllSelected = selectBoxes.every(
+    (selectBox) => {
+      return selectBox.value !== "false";
     }
-  });
-  return true;
+  );
+  return isAllSelected;
 };
 
 const resetForm = () => {
@@ -549,6 +548,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           );
         } else {
           alert("Ошибка при добавлении клиента");
+          resetForm();
         }
       }
     });
