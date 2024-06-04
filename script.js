@@ -197,6 +197,7 @@ const validateSelectBoxes = () => {
       return false;
     }
   });
+  return true;
 };
 
 const resetForm = () => {
@@ -527,6 +528,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const onSubmit = () => {
     formContent.addEventListener("submit", async (event) => {
       event.preventDefault();
+      console.log('onSubmit');
       if (isValidForm()) {
         DemoApp.showMainButtonLoader();
         const data = {};
