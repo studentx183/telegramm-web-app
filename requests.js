@@ -1,7 +1,5 @@
 axios.defaults.baseURL = config.baseUrl;
 
-const getZones = async () => await getData("/zone/list");
-
 const getRegionsByZoneId = async (zoneId) =>
   await getData(`/region/list/by-zoneId?zoneId=${zoneId}`);
 
@@ -19,7 +17,7 @@ const getTypes = async () => await getData("/client-type/list");
 const postClient = async (data) => await postData("/client/create", data);
 
 const postRegistrationData = async (data) =>
-  await postData("/client/get-agent-code", data);
+  await postData("/query/register", data);
 
 const getData = async (url) => {
   try {
@@ -40,7 +38,6 @@ const postData = async (url, data) => {
 };
 
 export {
-  getZones,
   getRegionsByZoneId,
   getCitiesByRegionId,
   getFormats,

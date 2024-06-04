@@ -1,5 +1,4 @@
 import {
-  getZones,
   getRegionsByZoneId,
   getCitiesByRegionId,
   getFormats,
@@ -12,17 +11,18 @@ import {
 
 let selectedLocation = null;
 
-// on-load DOM
-window.addEventListener("load", async () => {
+// on DOM mounted functions
+const onMountedFuncs = async () => {
   DemoApp.init();
   const agentCode = await getAgentCode();
   setAgentCode(agentCode);
-});
+  validateAgentCodeOnInput();
+};
 
 const getAgentCode = async () => {
   // gets agent code from the backend by sending initDataUnsafe of Telegram.WebApp
   const userData = DemoApp.initDataUnsafe;
-  if(!userData) return undefined;
+  if (!Object.keys(userData).length) return undefined;
   const { data: agentCode } = await postRegistrationData(userData);
   return agentCode || undefined;
 };
@@ -36,6 +36,7 @@ const setAgentCode = (agentCode) => {
 
 // validations
 const isValidForm = () => {
+  const isSelectBoxesValid = validateSelectBoxes();
   const isValidAgentCode = validateAgentCode();
   const isNameValid = validateName();
   const isPhoneValid = validatePhone();
@@ -45,7 +46,10 @@ const isValidForm = () => {
   const isReferencePointValid = validateReferencePoint();
   const submitBtn = document.getElementById("submit-btn");
 
-  if (
+  if (!isSelectBoxesValid) {
+    alert("Выберите все поля");
+    return false;
+  } else if (
     !isValidAgentCode ||
     !isNameValid ||
     !isPhoneValid ||
@@ -55,10 +59,6 @@ const isValidForm = () => {
     !isReferencePointValid
   ) {
     return false;
-  }
-  if (!submitBtn) {
-    alert("Заполните все поля");
-    return false;
   } else if (!selectedLocation) {
     alert("Выберите местоположение на карте");
     return false;
@@ -66,9 +66,22 @@ const isValidForm = () => {
   return true;
 };
 
+const validateEnteredValue = (element, value) => {
+  const regex = /^[a-zA-Z0-9_.-]*$/;
+  if (!value.match(regex)) {
+    const sanitizedValue = value.replace(/[^a-zA-Z0-9_.-]/g, "");
+    element.value = sanitizedValue;
+  }
+};
+
+const convertToUpperCase = (element) => {
+  element.value = element.value.toUpperCase();
+};
+
 const validateAgentCode = () => {
   const agentCodeInput = document.getElementById("agent-code-input");
-  agentCodeInput.value = agentCodeInput.value.toUpperCase();
+  validateEnteredValue(agentCodeInput, agentCodeInput.value);
+  convertToUpperCase(agentCodeInput);
   const errorTag = agentCodeInput.nextElementSibling;
   if (agentCodeInput.value.length < 3) {
     errorTag.textContent = "*Минимум 3 символов";
@@ -102,6 +115,8 @@ const validateInn = () => {
 
 const validateAddress = () => {
   const addressInput = document.getElementById("address-input");
+  validateEnteredValue(addressInput, addressInput.value);
+  convertToUpperCase(addressInput);
   const errorTag = addressInput.nextElementSibling;
   if (addressInput.value.length < 5) {
     errorTag.textContent = "*Минимум 5 символов";
@@ -113,6 +128,8 @@ const validateAddress = () => {
 
 const validateName = () => {
   const nameInput = document.getElementById("name-input");
+  validateEnteredValue(nameInput, nameInput.value);
+  convertToUpperCase(nameInput);
   const errorTag = nameInput.nextElementSibling;
   if (nameInput.value.length < 5) {
     errorTag.textContent = "*Минимум 5 символов";
@@ -124,7 +141,8 @@ const validateName = () => {
 
 const validateLegalName = () => {
   const legalNameInput = document.getElementById("legal-name-input");
-  legalNameInput.value = legalNameInput.value.toUpperCase();
+  validateEnteredValue(legalNameInput, legalNameInput.value);
+  convertToUpperCase(legalNameInput);
   const errorTag = legalNameInput.nextElementSibling;
   if (legalNameInput.value.length < 5) {
     errorTag.textContent = "*Минимум 5 символов";
@@ -136,6 +154,8 @@ const validateLegalName = () => {
 
 const validateReferencePoint = () => {
   const referenceInput = document.getElementById("reference-input");
+  validateEnteredValue(referenceInput, referenceInput.value);
+  convertToUpperCase(referenceInput);
   const errorTag = referenceInput.nextElementSibling;
   if (referenceInput.value.length < 5) {
     errorTag.textContent = "*Минимум 5 символов";
@@ -145,7 +165,7 @@ const validateReferencePoint = () => {
   return true;
 };
 
-const validateInfoInputs = () => {
+const validateInfoInputsOnInput = () => {
   document.getElementById("inn-input").addEventListener("input", validateInn);
   document
     .getElementById("phone-input")
@@ -162,14 +182,36 @@ const validateInfoInputs = () => {
     .addEventListener("input", validateReferencePoint);
 };
 
-const validateAgentCodeInput = () => {
+const validateAgentCodeOnInput = () => {
   const agentCodeInput = document.getElementById("agent-code-input");
   agentCodeInput.addEventListener("input", validateAgentCode);
 };
 
+const validateSelectBoxes = () => {
+  const selectBoxes = document.querySelectorAll("select");
+  selectBoxes.forEach((selectBox) => {
+    if (selectBox.value === "false") {
+      return false;
+    }
+  });
+  return true;
+};
+
 const resetForm = () => {
   const formContent = document.getElementById("addForm");
+  const agentCodeValue = formContent.agent_code.value;
   formContent.reset();
+  formContent.agent_code.value = agentCodeValue;
+};
+
+const getParsedCoords = (coords) => {
+  try {
+    const parsedCoords = JSON.parse(coords);
+    return parsedCoords;
+  } catch (error) {
+    console.log(error);
+    return {};
+  }
 };
 
 // on-submit form
@@ -181,6 +223,7 @@ const onClickSubmitBtn = () => {
 const onPostClient = async (_data) => {
   const latitude = selectedLocation[0];
   const longitude = selectedLocation[1];
+  const { query_id, hash } = DemoApp.initDataUnsafe;
   const {
     channel,
     category,
@@ -206,12 +249,13 @@ const onPostClient = async (_data) => {
     agent_code,
     latitude,
     longitude,
+    query_id,
+    hash,
     sales_channel_id: channel,
     client_category_id: category,
     city_id: city,
     format_id: format,
     client_type_id: type,
-    user_info: DemoApp.initDataUnsafe,
   };
 
   const response = await postClient(data);
@@ -222,12 +266,12 @@ const onPostClient = async (_data) => {
 const initYandexMap = () => {
   Telegram.WebApp.ready();
 
-  const memoryCoords = localStorage.getItem("userCoords");
+  const memoryCoords = DemoApp.getItem("userCoords");
   let userCoords = memoryCoords
-    ? JSON.parse(memoryCoords)
+    ? getParsedCoords(memoryCoords)
     : DemoApp.requestLocation();
   if (userCoords && !memoryCoords) {
-    localStorage.setItem("userCoords", JSON.stringify(userCoords));
+    DemoApp.setItem("userCoords", JSON.stringify(userCoords));
   } else userCoords = { latitude: 41.311081, longitude: 69.240562 };
 
   ymaps.ready(init);
@@ -262,21 +306,23 @@ const initYandexMap = () => {
 
 document.addEventListener("DOMContentLoaded", async () => {
   const formContent = document.getElementById("addForm");
-  validateAgentCodeInput();
+  await onMountedFuncs();
 
-  // create options for zone-select
-  const onCreateZoneOptions = async () => {
-    const zoneSelect = document.getElementById("zone");
-    const zones = (await getZones()) || [];
+  // create options for region-select
+  const onCreateRegionOptions = async () => {
+    const selectedZoneId = window.location.search.split("=")[1];
 
-    zones.forEach((zone) => {
+    const regionSelect = document.getElementById("region");
+    const regions = (await getRegionsByZoneId(selectedZoneId)) || [];
+
+    regions.forEach((region) => {
       const option = document.createElement("option");
-      option.value = zone.id;
-      option.textContent = zone.name;
-      zoneSelect.appendChild(option);
+      option.value = region.id;
+      option.textContent = region.name;
+      regionSelect.appendChild(option);
     });
   };
-  await onCreateZoneOptions();
+  await onCreateRegionOptions();
 
   // Utility function to remove elements by their IDs
   const removeElementsById = (ids) => {
@@ -296,8 +342,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     select.name = id;
     select.id = id;
     select.required = true;
-    select.innerHTML = `<option disabled selected required>${
-      options.length ? placeholder : "Нет данных"
+    select.innerHTML = `<option value="false" disabled selected required>${
+      options?.length ? placeholder : "Нет данных"
     }</option>`;
     options.forEach((item) => {
       const option = document.createElement("option");
@@ -349,35 +395,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       <div id="map" style="nargin-top: 12px"></div>
       <button style="visibility: hidden" type="submit" name="submit" id="submit-btn">Saqlash</button>`;
     formContent.appendChild(inputsDiv);
-  };
-
-  // Function to handle zone selection
-  const handleZoneChange = async (event) => {
-    removeElementsById([
-      "region",
-      "city",
-      "inputs",
-      "format",
-      "category",
-      "channel",
-      "type",
-      "map",
-    ]);
-
-    createLoader();
-    const selectedZoneId = event.target.value;
-    const regions = await getRegionsByZoneId(selectedZoneId);
-    removeLoader();
-
-    const regionSelect = createSelectElement(
-      "region",
-      regions,
-      "Регион",
-      "Выберите регион"
-    );
-
-    regionSelect.addEventListener("change", handleRegionChange);
-    formContent.appendChild(regionSelect);
   };
 
   // Function to handle region selection
@@ -498,7 +515,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       mask: "+{998} (00) 000-00-00",
     });
     IMask(document.getElementById("inn-input"), { mask: "000 000 000" });
-    validateInfoInputs();
+    validateInfoInputsOnInput();
   };
 
   // Create loader
@@ -527,7 +544,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         const response = await onPostClient(data);
         DemoApp.hideMainButtonLoader();
         if (response?.statusText === "OK") {
-          DemoApp.sendConfirmationToAddAgain("Клиент успешно добавлен!\nХотите добавить еще?");
+          DemoApp.sendConfirmationToAddAgain(
+            "Клиент успешно добавлен!\nХотите добавить еще?"
+          );
         } else {
           alert("Ошибка при добавлении клиента");
         }
@@ -537,8 +556,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   onSubmit();
 
-  // Initial event listener for the 'zone' select element
-  document.getElementById("zone").addEventListener("change", handleZoneChange);
+  // Initial event listener for the 'region' select element
+  document
+    .getElementById("region")
+    .addEventListener("change", handleRegionChange);
 });
 
 const handleAddAgainConfirmation = (isOkToAddAgain) => {
@@ -579,68 +600,26 @@ const DemoApp = {
   },
 
   // actions
-  sendData() {
-    // Telegram.WebApp.sendData(JSON.stringify(data));
-    Telegram.WebApp.sendData(
-      JSON.stringify({
-        action: "form_submission",
-        message: "Form submitted successfully!",
-      })
-    );
-  },
-
   sendConfirmationToAddAgain(message) {
     Telegram.WebApp.showConfirm(message, (isOkToAddAgain) =>
       handleAddAgainConfirmation(isOkToAddAgain)
     );
   },
 
-  sendMessage(msg_id, with_webview) {
-    if (!DemoApp.initDataUnsafe.query_id) {
-      alert("WebViewQueryId not defined");
-      return;
+  setItem(key, value) {
+    try {
+      Telegram.WebApp.CloudStorage.setItem(key, value);
+    } catch (error) {
+      console.log(error);
     }
+  },
 
-    document.querySelectorAll("button").forEach((btn) => (btn.disabled = true));
-
-    const btn = document.querySelector("#btn_status");
-    btn.textContent = "Sending...";
-
-    DemoApp.apiRequest(
-      "sendMessage",
-      {
-        msg_id: msg_id || "",
-        with_webview: !DemoApp.initDataUnsafe.receiver && with_webview ? 1 : 0,
-      },
-      function (result) {
-        document
-          .querySelectorAll("button")
-          .forEach((btn) => (btn.disabled = false));
-
-        if (result.response) {
-          if (result.response.ok) {
-            btn.textContent = "Message sent successfully!";
-            btn.className = "ok";
-            btn.style.display = "block";
-          } else {
-            btn.textContent = result.response.description;
-            btn.className = "err";
-            btn.style.display = "block";
-            alert(result.response.description);
-          }
-        } else if (result.error) {
-          btn.textContent = result.error;
-          btn.className = "err";
-          btn.style.display = "block";
-          alert(result.error);
-        } else {
-          btn.textContent = "Unknown error";
-          btn.className = "err";
-          btn.style.display = "block";
-          alert("Unknown error");
-        }
-      }
-    );
+  getItem(key) {
+    try {
+      return Telegram.WebApp.CloudStorage.getItem(key);
+    } catch (error) {
+      console.log(error);
+    }
   },
 
   // Permissions
@@ -651,45 +630,5 @@ const DemoApp = {
       });
     }
     return undefined;
-  },
-
-  // Other
-  apiRequest(method, data, onCallback) {
-    // DISABLE BACKEND FOR FRONTEND DEMO
-    // YOU CAN USE YOUR OWN REQUESTS TO YOUR OWN BACKEND
-    // CHANGE THIS CODE TO YOUR OWN
-    return (
-      onCallback &&
-      onCallback({
-        error:
-          "This function (" +
-          method +
-          ") should send requests to your backend. Please, change this code to your own.",
-      })
-    );
-
-    const authData = DemoApp.initData || "";
-    fetch("/demo/api", {
-      method: "POST",
-      body: JSON.stringify(
-        Object.assign(data, {
-          _auth: authData,
-          method: method,
-        })
-      ),
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then(function (response) {
-        return response.json();
-      })
-      .then(function (result) {
-        onCallback && onCallback(result);
-      })
-      .catch(function (error) {
-        onCallback && onCallback({ error: "Server error" });
-      });
   },
 };
