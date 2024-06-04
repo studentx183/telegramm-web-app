@@ -71,7 +71,8 @@ const isValidForm = () => {
 const validateEnteredValue = (element, value) => {
   const regex = /^[a-zA-Z0-9_.-]*$/;
   if (!value.match(regex)) {
-    element.value = "";
+    const sanitizedValue = value.replace(/[^a-zA-Z0-9_.-]/g, '');
+    element.value = sanitizedValue;
   }
 };
 
