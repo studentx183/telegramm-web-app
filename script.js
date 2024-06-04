@@ -46,8 +46,10 @@ const isValidForm = () => {
   const isReferencePointValid = validateReferencePoint();
   const submitBtn = document.getElementById("submit-btn");
 
-  if (
-    !isSelectBoxesValid ||
+  if (!isSelectBoxesValid) {
+    alert("Выберите все поля");
+    return false;
+  } else if (
     !isValidAgentCode ||
     !isNameValid ||
     !isPhoneValid ||
@@ -56,10 +58,6 @@ const isValidForm = () => {
     !isAddressValid ||
     !isReferencePointValid
   ) {
-    return false;
-  }
-  if (!submitBtn) {
-    alert("Заполните все поля");
     return false;
   } else if (!selectedLocation) {
     alert("Выберите местоположение на карте");
@@ -71,7 +69,7 @@ const isValidForm = () => {
 const validateEnteredValue = (element, value) => {
   const regex = /^[a-zA-Z0-9_.-]*$/;
   if (!value.match(regex)) {
-    const sanitizedValue = value.replace(/[^a-zA-Z0-9_.-]/g, '');
+    const sanitizedValue = value.replace(/[^a-zA-Z0-9_.-]/g, "");
     element.value = sanitizedValue;
   }
 };
@@ -192,9 +190,7 @@ const validateAgentCodeOnInput = () => {
 const validateSelectBoxes = () => {
   const selectBoxes = document.querySelectorAll("select");
   selectBoxes.forEach((selectBox) => {
-    if (!selectBox.value) {
-      selectBox.style.border = "1px solid red";
-      alert(`Выберите значение для ${select.name}`);
+    if (selectBox.value === "false") {
       return false;
     }
   });
@@ -336,7 +332,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     select.name = id;
     select.id = id;
     select.required = true;
-    select.innerHTML = `<option disabled selected required>${
+    select.innerHTML = `<option value="false" disabled selected required>${
       options?.length ? placeholder : "Нет данных"
     }</option>`;
     options.forEach((item) => {
@@ -543,6 +539,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           );
         } else {
           alert("Ошибка при добавлении клиента");
+          resetForm();
         }
       }
     });
