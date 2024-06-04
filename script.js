@@ -11,12 +11,13 @@ import {
 
 let selectedLocation = null;
 
-// on-load DOM
-window.addEventListener("load", async () => {
+// on DOM mounted functions
+const onMountedFuncs = async () => {
   DemoApp.init();
   const agentCode = await getAgentCode();
   setAgentCode(agentCode);
-});
+  validateAgentCodeOnInput();
+};
 
 const getAgentCode = async () => {
   // gets agent code from the backend by sending initDataUnsafe of Telegram.WebApp
@@ -187,13 +188,6 @@ const validateAgentCodeOnInput = () => {
   agentCodeInput.addEventListener("input", validateAgentCode);
 };
 
-const resetForm = () => {
-  const formContent = document.getElementById("addForm");
-  const agentCodeValue = formContent.agent_code.value;
-  formContent.reset();
-  formContent.agent_code.value = agentCodeValue;
-};
-
 const validateSelectBoxes = () => {
   const selectBoxes = document.querySelectorAll("select");
   selectBoxes.forEach((selectBox) => {
@@ -203,6 +197,13 @@ const validateSelectBoxes = () => {
       return false;
     }
   });
+};
+
+const resetForm = () => {
+  const formContent = document.getElementById("addForm");
+  const agentCodeValue = formContent.agent_code.value;
+  formContent.reset();
+  formContent.agent_code.value = agentCodeValue;
 };
 
 // on-submit form
@@ -297,7 +298,7 @@ const initYandexMap = () => {
 
 document.addEventListener("DOMContentLoaded", async () => {
   const formContent = document.getElementById("addForm");
-  validateAgentCodeOnInput();
+  await onMountedFuncs();
 
   // create options for region-select
   const onCreateRegionOptions = async () => {
