@@ -197,7 +197,6 @@ const resetForm = () => {
 const validateSelectBoxes = () => {
   const selectBoxes = document.querySelectorAll("select");
   selectBoxes.forEach((selectBox) => {
-    console.log(selectBox.value, 'selectBox');
     if (!selectBox.value) {
       selectBox.style.border = "1px solid red";
       alert(`Выберите значение для ${select.name}`);
@@ -498,7 +497,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Function to handle type selection
   const handleTypeChange = () => {
-    validateSelectBoxes();
     removeElementsById(["inputs"]);
     createInfoInputs();
     // init yandex-maps
