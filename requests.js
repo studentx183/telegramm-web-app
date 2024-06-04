@@ -1,7 +1,5 @@
 axios.defaults.baseURL = config.baseUrl;
 
-const getZones = async () => await getData("/zone/list");
-
 const getRegionsByZoneId = async (zoneId) =>
   await getData(`/region/list/by-zoneId?zoneId=${zoneId}`);
 
@@ -40,7 +38,6 @@ const postData = async (url, data) => {
 };
 
 export {
-  getZones,
   getRegionsByZoneId,
   getCitiesByRegionId,
   getFormats,
