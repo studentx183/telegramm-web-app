@@ -1,5 +1,4 @@
 import {
-  getZones,
   getRegionsByZoneId,
   getCitiesByRegionId,
   getFormats,
@@ -22,7 +21,7 @@ window.addEventListener("load", async () => {
 const getAgentCode = async () => {
   // gets agent code from the backend by sending initDataUnsafe of Telegram.WebApp
   const userData = DemoApp.initDataUnsafe;
-  if (!userData) return undefined;
+  if (!Object.keys(userData).length) return undefined;
   const { data: agentCode } = await postRegistrationData(userData);
   return agentCode || undefined;
 };
@@ -36,6 +35,7 @@ const setAgentCode = (agentCode) => {
 
 // validations
 const isValidForm = () => {
+  const isSelectBoxesValid = validateSelectBoxes();
   const isValidAgentCode = validateAgentCode();
   const isNameValid = validateName();
   const isPhoneValid = validatePhone();
@@ -46,6 +46,7 @@ const isValidForm = () => {
   const submitBtn = document.getElementById("submit-btn");
 
   if (
+    isSelectBoxesValid ||
     !isValidAgentCode ||
     !isNameValid ||
     !isPhoneValid ||
@@ -66,9 +67,21 @@ const isValidForm = () => {
   return true;
 };
 
+const validateEnteredValue = (element, value) => {
+  const regex = /^[a-zA-Z0-9_.-]*$/;
+  if (!value.match(regex)) {
+    element.value = "";
+  }
+};
+
+const convertToUpperCase = (element) => {
+  element.value = element.value.toUpperCase();
+};
+
 const validateAgentCode = () => {
   const agentCodeInput = document.getElementById("agent-code-input");
-  agentCodeInput.value = agentCodeInput.value.toUpperCase();
+  validateEnteredValue(agentCodeInput, agentCodeInput.value);
+  convertToUpperCase(agentCodeInput);
   const errorTag = agentCodeInput.nextElementSibling;
   if (agentCodeInput.value.length < 3) {
     errorTag.textContent = "*Минимум 3 символов";
@@ -102,6 +115,8 @@ const validateInn = () => {
 
 const validateAddress = () => {
   const addressInput = document.getElementById("address-input");
+  validateEnteredValue(addressInput, addressInput.value);
+  convertToUpperCase(addressInput);
   const errorTag = addressInput.nextElementSibling;
   if (addressInput.value.length < 5) {
     errorTag.textContent = "*Минимум 5 символов";
@@ -113,6 +128,8 @@ const validateAddress = () => {
 
 const validateName = () => {
   const nameInput = document.getElementById("name-input");
+  validateEnteredValue(nameInput, nameInput.value);
+  convertToUpperCase(nameInput);
   const errorTag = nameInput.nextElementSibling;
   if (nameInput.value.length < 5) {
     errorTag.textContent = "*Минимум 5 символов";
@@ -124,7 +141,8 @@ const validateName = () => {
 
 const validateLegalName = () => {
   const legalNameInput = document.getElementById("legal-name-input");
-  legalNameInput.value = legalNameInput.value.toUpperCase();
+  validateEnteredValue(legalNameInput, legalNameInput.value);
+  convertToUpperCase(legalNameInput);
   const errorTag = legalNameInput.nextElementSibling;
   if (legalNameInput.value.length < 5) {
     errorTag.textContent = "*Минимум 5 символов";
@@ -136,6 +154,8 @@ const validateLegalName = () => {
 
 const validateReferencePoint = () => {
   const referenceInput = document.getElementById("reference-input");
+  validateEnteredValue(referenceInput, referenceInput.value);
+  convertToUpperCase(referenceInput);
   const errorTag = referenceInput.nextElementSibling;
   if (referenceInput.value.length < 5) {
     errorTag.textContent = "*Минимум 5 символов";
@@ -145,7 +165,7 @@ const validateReferencePoint = () => {
   return true;
 };
 
-const validateInfoInputs = () => {
+const validateInfoInputsOnInput = () => {
   document.getElementById("inn-input").addEventListener("input", validateInn);
   document
     .getElementById("phone-input")
@@ -162,14 +182,27 @@ const validateInfoInputs = () => {
     .addEventListener("input", validateReferencePoint);
 };
 
-const validateAgentCodeInput = () => {
+const validateAgentCodeOnInput = () => {
   const agentCodeInput = document.getElementById("agent-code-input");
   agentCodeInput.addEventListener("input", validateAgentCode);
 };
 
 const resetForm = () => {
   const formContent = document.getElementById("addForm");
+  const agentCodeValue = form.agent_code.value;
   formContent.reset();
+  formContent.agent_code.value = agentCodeValue;
+};
+
+const validateSelectBoxes = () => {
+  const selectBoxes = document.querySelectorAll("select");
+  selectBoxes.forEach((selectBox) => {
+    if (!selectBox.value) {
+      selectBox.style.border = "1px solid red";
+      alert(`Выберите значение для ${select.name}`);
+      return false;
+    }
+  });
 };
 
 // on-submit form
@@ -264,21 +297,24 @@ const initYandexMap = () => {
 
 document.addEventListener("DOMContentLoaded", async () => {
   const formContent = document.getElementById("addForm");
-  validateAgentCodeInput();
+  validateAgentCodeOnInput();
 
-  // create options for zone-select
-  const onCreateZoneOptions = async () => {
-    const zoneSelect = document.getElementById("zone");
-    const zones = (await getZones()) || [];
+  // create options for region-select
+  const onCreateRegionOptions = async () => {
+    const selectedZoneId = window.location.search.split("=")[1];
 
-    zones.forEach((zone) => {
+
+    const regionSelect = document.getElementById("region");
+    const regions = (await getRegionsByZoneId(selectedZoneId)) || [];
+
+    regions.forEach((region) => {
       const option = document.createElement("option");
-      option.value = zone.id;
-      option.textContent = zone.name;
-      zoneSelect.appendChild(option);
+      option.value = region.id;
+      option.textContent = region.name;
+      regionSelect.appendChild(option);
     });
   };
-  await onCreateZoneOptions();
+  await onCreateRegionOptions();
 
   // Utility function to remove elements by their IDs
   const removeElementsById = (ids) => {
@@ -299,7 +335,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     select.id = id;
     select.required = true;
     select.innerHTML = `<option disabled selected required>${
-      options.length ? placeholder : "Нет данных"
+      options?.length ? placeholder : "Нет данных"
     }</option>`;
     options.forEach((item) => {
       const option = document.createElement("option");
@@ -351,35 +387,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       <div id="map" style="nargin-top: 12px"></div>
       <button style="visibility: hidden" type="submit" name="submit" id="submit-btn">Saqlash</button>`;
     formContent.appendChild(inputsDiv);
-  };
-
-  // Function to handle zone selection
-  const handleZoneChange = async (event) => {
-    removeElementsById([
-      "region",
-      "city",
-      "inputs",
-      "format",
-      "category",
-      "channel",
-      "type",
-      "map",
-    ]);
-
-    createLoader();
-    const selectedZoneId = event.target.value;
-    const regions = await getRegionsByZoneId(selectedZoneId);
-    removeLoader();
-
-    const regionSelect = createSelectElement(
-      "region",
-      regions,
-      "Регион",
-      "Выберите регион"
-    );
-
-    regionSelect.addEventListener("change", handleRegionChange);
-    formContent.appendChild(regionSelect);
   };
 
   // Function to handle region selection
@@ -500,7 +507,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       mask: "+{998} (00) 000-00-00",
     });
     IMask(document.getElementById("inn-input"), { mask: "000 000 000" });
-    validateInfoInputs();
+    validateInfoInputsOnInput();
   };
 
   // Create loader
@@ -541,8 +548,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   onSubmit();
 
-  // Initial event listener for the 'zone' select element
-  document.getElementById("zone").addEventListener("change", handleZoneChange);
+  // Initial event listener for the 'region' select element
+  document.getElementById("region").addEventListener("change", handleRegionChange);
 });
 
 const handleAddAgainConfirmation = (isOkToAddAgain) => {
