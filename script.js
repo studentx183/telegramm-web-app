@@ -188,11 +188,9 @@ const validateAgentCodeOnInput = () => {
 
 const validateSelectBoxes = () => {
   const selectBoxes = Array.from(document.querySelectorAll("select"));
-  const isAllSelected = selectBoxes.every(
-    (selectBox) => {
-      return selectBox.value !== "false";
-    }
-  );
+  const isAllSelected = selectBoxes.every((selectBox) => {
+    return selectBox.value !== "false";
+  });
   return isAllSelected;
 };
 
@@ -203,6 +201,7 @@ const resetForm = () => {
   formContent.agent_code.value = agentCodeValue;
 };
 
+// additional functions
 const getParsedCoords = (coords) => {
   try {
     const parsedCoords = JSON.parse(coords);
@@ -211,6 +210,13 @@ const getParsedCoords = (coords) => {
     console.log(error);
     return {};
   }
+};
+
+const getSelectedZoneId = () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const selectedZoneId = urlParams.get("zone_id");
+  console.log(selectedZoneId, "zone-id");
+  return selectedZoneId;
 };
 
 // on-submit form
@@ -309,7 +315,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // create options for region-select
   const onCreateRegionOptions = async () => {
-    const selectedZoneId = window.location.search.split("=")[1];
+    const selectedZoneId = getSelectedZoneId();
 
     const regionSelect = document.getElementById("region");
     const regions = (await getRegionsByZoneId(selectedZoneId)) || [];
@@ -319,14 +325,19 @@ document.addEventListener("DOMContentLoaded", async () => {
       option.value = region.id;
       option.textContent = region.name;
       regionSelect.appendChild(option);
-
-      // Auto select the first element
-      if (index === 0) {
-        option.selected = true;
-      }
     });
+
+    if (regions.length === 1) {
+      // auto-select if there is only one region
+      autoSelectRegion(regionSelect);
+    }
   };
-  await onCreateRegionOptions();
+
+  const autoSelectRegion = async (regionSelect) => {
+    const selectedRegion = regionSelect.options[1];
+    selectedRegion.selected = true;
+    await handleRegionChange({ target: selectedRegion });
+  };
 
   // Utility function to remove elements by their IDs
   const removeElementsById = (ids) => {
@@ -559,6 +570,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   };
 
+  await onCreateRegionOptions();
   onSubmit();
 
   // Initial event listener for the 'region' select element
