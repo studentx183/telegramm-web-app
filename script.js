@@ -259,12 +259,12 @@ const onPostClient = async (_data) => {
 const initYandexMap = () => {
   Telegram.WebApp.ready();
 
-  const memoryCoords = localStorage.getItem("userCoords");
+  const memoryCoords = DemoApp.getItem("userCoords");
   let userCoords = memoryCoords
     ? JSON.parse(memoryCoords)
     : DemoApp.requestLocation();
   if (userCoords && !memoryCoords) {
-    localStorage.setItem("userCoords", JSON.stringify(userCoords));
+    DemoApp.setItem("userCoords", JSON.stringify(userCoords));
   } else userCoords = { latitude: 41.311081, longitude: 69.240562 };
 
   ymaps.ready(init);
@@ -304,7 +304,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   // create options for region-select
   const onCreateRegionOptions = async () => {
     const selectedZoneId = window.location.search.split("=")[1];
-
 
     const regionSelect = document.getElementById("region");
     const regions = (await getRegionsByZoneId(selectedZoneId)) || [];
@@ -551,7 +550,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   onSubmit();
 
   // Initial event listener for the 'region' select element
-  document.getElementById("region").addEventListener("change", handleRegionChange);
+  document
+    .getElementById("region")
+    .addEventListener("change", handleRegionChange);
 });
 
 const handleAddAgainConfirmation = (isOkToAddAgain) => {
@@ -592,68 +593,26 @@ const DemoApp = {
   },
 
   // actions
-  sendData() {
-    // Telegram.WebApp.sendData(JSON.stringify(data));
-    Telegram.WebApp.sendData(
-      JSON.stringify({
-        action: "form_submission",
-        message: "Form submitted successfully!",
-      })
-    );
-  },
-
   sendConfirmationToAddAgain(message) {
     Telegram.WebApp.showConfirm(message, (isOkToAddAgain) =>
       handleAddAgainConfirmation(isOkToAddAgain)
     );
   },
 
-  sendMessage(msg_id, with_webview) {
-    if (!DemoApp.initDataUnsafe.query_id) {
-      alert("WebViewQueryId not defined");
-      return;
+  setItem(key, value) {
+    try {
+      Telegram.WebApp.CloudStorage.setItem(key, value);
+    } catch (error) {
+      console.log(error);
     }
+  },
 
-    document.querySelectorAll("button").forEach((btn) => (btn.disabled = true));
-
-    const btn = document.querySelector("#btn_status");
-    btn.textContent = "Sending...";
-
-    DemoApp.apiRequest(
-      "sendMessage",
-      {
-        msg_id: msg_id || "",
-        with_webview: !DemoApp.initDataUnsafe.receiver && with_webview ? 1 : 0,
-      },
-      function (result) {
-        document
-          .querySelectorAll("button")
-          .forEach((btn) => (btn.disabled = false));
-
-        if (result.response) {
-          if (result.response.ok) {
-            btn.textContent = "Message sent successfully!";
-            btn.className = "ok";
-            btn.style.display = "block";
-          } else {
-            btn.textContent = result.response.description;
-            btn.className = "err";
-            btn.style.display = "block";
-            alert(result.response.description);
-          }
-        } else if (result.error) {
-          btn.textContent = result.error;
-          btn.className = "err";
-          btn.style.display = "block";
-          alert(result.error);
-        } else {
-          btn.textContent = "Unknown error";
-          btn.className = "err";
-          btn.style.display = "block";
-          alert("Unknown error");
-        }
-      }
-    );
+  getItem(key) {
+    try {
+      return Telegram.WebApp.CloudStorage.getItem(key);
+    } catch (error) {
+      console.log(error);
+    }
   },
 
   // Permissions
@@ -664,45 +623,5 @@ const DemoApp = {
       });
     }
     return undefined;
-  },
-
-  // Other
-  apiRequest(method, data, onCallback) {
-    // DISABLE BACKEND FOR FRONTEND DEMO
-    // YOU CAN USE YOUR OWN REQUESTS TO YOUR OWN BACKEND
-    // CHANGE THIS CODE TO YOUR OWN
-    return (
-      onCallback &&
-      onCallback({
-        error:
-          "This function (" +
-          method +
-          ") should send requests to your backend. Please, change this code to your own.",
-      })
-    );
-
-    const authData = DemoApp.initData || "";
-    fetch("/demo/api", {
-      method: "POST",
-      body: JSON.stringify(
-        Object.assign(data, {
-          _auth: authData,
-          method: method,
-        })
-      ),
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then(function (response) {
-        return response.json();
-      })
-      .then(function (result) {
-        onCallback && onCallback(result);
-      })
-      .catch(function (error) {
-        onCallback && onCallback({ error: "Server error" });
-      });
   },
 };
