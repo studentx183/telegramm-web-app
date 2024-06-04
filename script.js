@@ -204,6 +204,16 @@ const resetForm = () => {
   formContent.agent_code.value = agentCodeValue;
 };
 
+const getParsedCoords = (coords) => {
+  try {
+    const parsedCoords = JSON.parse(coords);
+    return parsedCoords;
+  } catch (error) {
+    console.log(error);
+    return {};
+  }
+};
+
 // on-submit form
 const onClickSubmitBtn = () => {
   const submitBtn = document.getElementById("submit-btn");
@@ -258,7 +268,7 @@ const initYandexMap = () => {
 
   const memoryCoords = DemoApp.getItem("userCoords");
   let userCoords = memoryCoords
-    ? JSON.parse(memoryCoords)
+    ? getParsedCoords(memoryCoords)
     : DemoApp.requestLocation();
   if (userCoords && !memoryCoords) {
     DemoApp.setItem("userCoords", JSON.stringify(userCoords));
