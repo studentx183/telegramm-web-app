@@ -539,7 +539,6 @@ document.addEventListener("DOMContentLoaded", async () => {
           );
         } else {
           alert("Ошибка при добавлении клиента");
-          resetForm();
         }
       }
     });
