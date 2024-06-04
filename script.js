@@ -189,7 +189,7 @@ const validateAgentCodeOnInput = () => {
 
 const resetForm = () => {
   const formContent = document.getElementById("addForm");
-  const agentCodeValue = form.agent_code.value;
+  const agentCodeValue = formContent.agent_code.value;
   formContent.reset();
   formContent.agent_code.value = agentCodeValue;
 };
