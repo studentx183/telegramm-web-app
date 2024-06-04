@@ -314,11 +314,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     const regionSelect = document.getElementById("region");
     const regions = (await getRegionsByZoneId(selectedZoneId)) || [];
 
-    regions.forEach((region) => {
+    regions.forEach((region, index) => {
       const option = document.createElement("option");
       option.value = region.id;
       option.textContent = region.name;
       regionSelect.appendChild(option);
+
+      // Auto select the first element
+      if (index === 0) {
+        option.selected = true;
+      }
     });
   };
   await onCreateRegionOptions();
@@ -462,7 +467,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       "category",
       categories,
       "Категория",
-      "Выберите категорю"
+      "Выберите категорию"
     );
     categorySelect.addEventListener("change", handleCategoryChange);
     formContent.appendChild(categorySelect);
