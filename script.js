@@ -105,23 +105,29 @@ const validatePhone = () => {
 
 const validateInn = () => {
   const innInput = document.getElementById("inn-input");
+  const pinflInput = document.getElementById("pinfl-input");
   const errorTag = innInput.nextElementSibling;
+  const pinflInputErrorTag = pinflInput.nextElementSibling;
   if (innInput.value.length < 11) {
     errorTag.textContent = "*Введите корректный ИНН";
     return false;
   }
   errorTag.textContent = null;
+  pinflInputErrorTag.textContent = null;
   return true;
 };
 
 const validatePinfl = () => {
-  const innInput = document.getElementById("pinfl-input");
-  const errorTag = innInput.nextElementSibling;
-  if (innInput.value.length !== 14) {
+  const pinflInput = document.getElementById("pinfl-input");
+  const innInput = document.getElementById("inn-input");
+  const errorTag = pinflInput.nextElementSibling;
+  const innInputErrorTag = innInput.nextElementSibling;
+  if (pinflInput.value.length !== 14) {
     errorTag.textContent = "*Введите корректный ПИНФЛ";
     return false;
   }
   errorTag.textContent = null;
+  innInputErrorTag.textContent = null;
   return true;
 };
 
