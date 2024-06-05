@@ -256,6 +256,18 @@ const getSelectedZoneId = () => {
   return selectedZoneId;
 };
 
+const getUnMaskedInn = () => {
+  return +IMask(document.getElementById("inn-input"), {
+    mask: "000 000 000",
+  }).unmaskedValue;
+};
+
+const getUnMaskedPinfl = () => {
+  return +IMask(document.getElementById("pinfl-input"), {
+    mask: "0 000000 000 000 0",
+  }).unmaskedValue;
+}
+
 // on-submit form
 const onClickSubmitBtn = () => {
   const submitBtn = document.getElementById("submit-btn");
@@ -274,21 +286,19 @@ const onPostClient = async (_data) => {
     type,
     address,
     company_name,
-    inn,
-    pinfl,
     name,
     navigate,
     phone,
     agent_code,
   } = _data;
-  inn = Number(inn.trim());
-  pinfl = Number(pinfl.trim());
+  const unMaskedInn = getUnMaskedInn();
+  const unMaskedPinfl = getUnMaskedPinfl();
 
   const data = {
     address,
     company_name,
-    inn,
-    pinfl,
+    unMaskedInn,
+    unMaskedPinfl,
     name,
     navigate,
     phone,
