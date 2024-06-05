@@ -112,7 +112,10 @@ const validateInn = () => {
     errorTag.textContent = "*Введите корректный ИНН";
     return false;
   }
-  pinflInput.value = null;
+  const isValidPinfl = pinflInput.value.length === 14;
+  if (!isValidPinfl) {
+    pinflInput.value = null;
+  }
   errorTag.textContent = null;
   pinflInputErrorTag.textContent = null;
   return true;
@@ -127,7 +130,10 @@ const validatePinfl = () => {
     errorTag.textContent = "*Введите корректный ПИНФЛ";
     return false;
   }
-  innInput.value = null;
+  const isValidInn = innInput.value.length === 11;
+  if (!isValidInn) {
+    innInput.value = null;
+  }
   errorTag.textContent = null;
   innInputErrorTag.textContent = null;
   return true;
@@ -593,7 +599,6 @@ document.addEventListener("DOMContentLoaded", async () => {
           );
         } else {
           alert("Ошибка при добавлении клиента");
-          resetForm();
         }
       }
     });
