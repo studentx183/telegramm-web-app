@@ -297,8 +297,8 @@ const onPostClient = async (_data) => {
   const data = {
     address,
     company_name,
-    unMaskedInn,
-    unMaskedPinfl,
+    inn: unMaskedInn,
+    pinfl: unMaskedPinfl,
     name,
     navigate,
     phone,
