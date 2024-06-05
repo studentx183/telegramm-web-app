@@ -43,12 +43,12 @@ const isValidForm = () => {
   const isLegalNameValid = validateLegalName();
   const isAddressValid = validateAddress();
   const isReferencePointValid = validateReferencePoint();
-  const isPnflOrInnValid = validatePnfl() || validateInn();
+  const isPinflOrInnValid = validatePinfl() || validateInn();
 
   if (!isSelectBoxesValid) {
     alert("Выберите все поля");
     return false;
-  } else if (!isPnflOrInnValid) {
+  } else if (!isPinflOrInnValid) {
     alert("Введите корректный ИНН или ПИНФЛ");
     return false;
   } else if (
@@ -114,8 +114,8 @@ const validateInn = () => {
   return true;
 };
 
-const validatePnfl = () => {
-  const innInput = document.getElementById("pnfl-input");
+const validatePinfl = () => {
+  const innInput = document.getElementById("pinfl-input");
   const errorTag = innInput.nextElementSibling;
   if (innInput.value.length !== 14) {
     errorTag.textContent = "*Введите корректный ПИНФЛ";
@@ -179,7 +179,9 @@ const validateReferencePoint = () => {
 
 const validateInfoInputsOnInput = () => {
   document.getElementById("inn-input").addEventListener("input", validateInn);
-  document.getElementById("pnfl-input").addEventListener("input", validatePnfl);
+  document
+    .getElementById("pinfl-input")
+    .addEventListener("input", validatePinfl);
   document
     .getElementById("phone-input")
     .addEventListener("input", validatePhone);
@@ -252,6 +254,7 @@ const onPostClient = async (_data) => {
     address,
     company_name,
     inn,
+    pinfl,
     name,
     navigate,
     phone,
@@ -262,6 +265,7 @@ const onPostClient = async (_data) => {
     address,
     company_name,
     inn,
+    pinfl,
     name,
     navigate,
     phone,
@@ -412,7 +416,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       </div>
       <div style="position: relative">
         <label for="inn-input">ПИНФЛ</label>
-        <input type="text" name="pnfl" id="pnfl-input" class="text-input" placeholder="ПИНФЛ" />
+        <input type="text" name="pinfl" id="pinfl-input" class="text-input" placeholder="ПИНФЛ" />
         <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
       </div>
       <div style="position: relative">
