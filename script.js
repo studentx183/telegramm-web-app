@@ -43,13 +43,13 @@ const isValidForm = () => {
   const isLegalNameValid = validateLegalName();
   const isAddressValid = validateAddress();
   const isReferencePointValid = validateReferencePoint();
-  const isPinflOrInnValid = validatePinfl() || validateInn();
+  const isPinflOrInnValid = validatePinfl() && validateInn();
 
   if (!isSelectBoxesValid) {
-    alert("Выберите все поля");
+    DemoApp.showAlert("Выберите все поля");
     return false;
   } else if (!isPinflOrInnValid) {
-    alert("Введите корректный ИНН или ПИНФЛ");
+    DemoApp.showAlert("Введите корректный ИНН или ПИНФЛ");
     return false;
   } else if (
     !isValidAgentCode ||
@@ -61,7 +61,7 @@ const isValidForm = () => {
   ) {
     return false;
   } else if (!selectedLocation) {
-    alert("Выберите местоположение на карте");
+    DemoApp.showAlert("Выберите местоположение на карте");
     return false;
   }
   return true;
@@ -108,16 +108,20 @@ const validateInn = () => {
   const pinflInput = document.getElementById("pinfl-input");
   const errorTag = innInput.nextElementSibling;
   const pinflInputErrorTag = pinflInput.nextElementSibling;
+
+  const isValidPinfl = pinflInput.value.length === 18;
+  if (innInput.value.length === 0 && isValidPinfl) {
+    errorTag.textContent = null;
+    return true;
+  }
+
   if (innInput.value.length < 11) {
     errorTag.textContent = "*Введите корректный ИНН";
     return false;
   }
-  const isValidPinfl = pinflInput.value.length === 14;
-  if (!isValidPinfl) {
-    pinflInput.value = null;
-  }
+
+  pinflInput.value.length === 0 && (pinflInputErrorTag.textContent = null);
   errorTag.textContent = null;
-  pinflInputErrorTag.textContent = null;
   return true;
 };
 
@@ -126,16 +130,20 @@ const validatePinfl = () => {
   const innInput = document.getElementById("inn-input");
   const errorTag = pinflInput.nextElementSibling;
   const innInputErrorTag = innInput.nextElementSibling;
-  if (pinflInput.value.length !== 14) {
+
+  const isValidInn = innInput.value.length === 11;
+  if (pinflInput.value.length === 0 && isValidInn) {
+    errorTag.textContent = null;
+    return true;
+  }
+
+  if (pinflInput.value.length !== 18) {
     errorTag.textContent = "*Введите корректный ПИНФЛ";
     return false;
   }
-  const isValidInn = innInput.value.length === 11;
-  if (!isValidInn) {
-    innInput.value = null;
-  }
+
+  innInput.value.length === 0 && (innInputErrorTag.textContent = null);
   errorTag.textContent = null;
-  innInputErrorTag.textContent = null;
   return true;
 };
 
@@ -428,7 +436,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
       </div>
       <div style="position: relative">
-        <label for="inn-input">ПИНФЛ</label>
+        <label for="pinfl-input">ПИНФЛ</label>
         <input type="text" name="pinfl" id="pinfl-input" class="text-input" placeholder="ПИНФЛ" />
         <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
       </div>
@@ -565,6 +573,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       mask: "+{998} (00) 000-00-00",
     });
     IMask(document.getElementById("inn-input"), { mask: "000 000 000" });
+    IMask(document.getElementById("pinfl-input"), {
+      mask: "0 000000 000 000 0",
+    });
     validateInfoInputsOnInput();
   };
 
@@ -598,7 +609,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             "Клиент успешно добавлен!\nХотите добавить еще?"
           );
         } else {
-          alert("Ошибка при добавлении клиента");
+          DemoApp.showAlert("Ошибка при добавлении клиента");
         }
       }
     });
@@ -651,6 +662,10 @@ const DemoApp = {
   },
 
   // actions
+  showAlert(message) {
+    Telegram.WebApp.showAlert(message);
+  },
+
   sendConfirmationToAddAgain(message) {
     Telegram.WebApp.showConfirm(message, (isOkToAddAgain) =>
       handleAddAgainConfirmation(isOkToAddAgain)
