@@ -231,7 +231,6 @@ const getParsedCoords = (coords) => {
 const getSelectedZoneId = () => {
   const urlParams = new URLSearchParams(window.location.search);
   const selectedZoneId = urlParams.get("zone_id");
-  console.log(selectedZoneId, "zone-id");
   return selectedZoneId;
 };
 
