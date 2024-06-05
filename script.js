@@ -281,6 +281,8 @@ const onPostClient = async (_data) => {
     phone,
     agent_code,
   } = _data;
+  inn = Number(inn.trim());
+  pinfl = Number(pinfl.trim());
 
   const data = {
     address,
@@ -432,12 +434,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       </div>
       <div style="position: relative">
         <label for="inn-input">Инн</label>
-        <input type="text" name="inn" id="inn-input" class="text-input" placeholder="Инн" />
+        <input type="text" inputmode="numeric" name="inn" id="inn-input" class="text-input" placeholder="Инн" />
         <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
       </div>
       <div style="position: relative">
         <label for="pinfl-input">ПИНФЛ</label>
-        <input type="text" name="pinfl" id="pinfl-input" class="text-input" placeholder="ПИНФЛ" />
+        <input type="text" inputmode="numeric" name="pinfl" id="pinfl-input" class="text-input" placeholder="ПИНФЛ" />
         <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
       </div>
       <div style="position: relative">
