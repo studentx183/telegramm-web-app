@@ -112,7 +112,7 @@ const validateInn = () => {
     errorTag.textContent = "*Введите корректный ИНН";
     return false;
   }
-  const isValidPinfl = pinflInput.value.length === 14;
+  const isValidPinfl = pinflInput.value.length === 18;
   if (!isValidPinfl) {
     pinflInput.value = null;
   }
@@ -126,7 +126,7 @@ const validatePinfl = () => {
   const innInput = document.getElementById("inn-input");
   const errorTag = pinflInput.nextElementSibling;
   const innInputErrorTag = innInput.nextElementSibling;
-  if (pinflInput.value.length !== 14) {
+  if (pinflInput.value.length !== 18) {
     errorTag.textContent = "*Введите корректный ПИНФЛ";
     return false;
   }
@@ -565,6 +565,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       mask: "+{998} (00) 000-00-00",
     });
     IMask(document.getElementById("inn-input"), { mask: "000 000 000" });
+    IMask(document.getElementById("pinfl-input"), { mask: "0 000000 000 000 0" });
     validateInfoInputsOnInput();
   };
 
