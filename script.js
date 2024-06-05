@@ -46,10 +46,10 @@ const isValidForm = () => {
   const isPinflOrInnValid = validatePinfl() && validateInn();
 
   if (!isSelectBoxesValid) {
-    alert("Выберите все поля");
+    DemoApp.showAlert("Выберите все поля");
     return false;
   } else if (!isPinflOrInnValid) {
-    alert("Введите корректный ИНН или ПИНФЛ");
+    DemoApp.showAlert("Введите корректный ИНН или ПИНФЛ");
     return false;
   } else if (
     !isValidAgentCode ||
@@ -61,7 +61,7 @@ const isValidForm = () => {
   ) {
     return false;
   } else if (!selectedLocation) {
-    alert("Выберите местоположение на карте");
+    DemoApp.showAlert("Выберите местоположение на карте");
     return false;
   }
   return true;
@@ -609,7 +609,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             "Клиент успешно добавлен!\nХотите добавить еще?"
           );
         } else {
-          alert("Ошибка при добавлении клиента");
+          DemoApp.showAlert("Ошибка при добавлении клиента");
         }
       }
     });
@@ -662,6 +662,10 @@ const DemoApp = {
   },
 
   // actions
+  showAlert(message) {
+    Telegram.WebApp.showAlert(message);
+  },
+
   sendConfirmationToAddAgain(message) {
     Telegram.WebApp.showConfirm(message, (isOkToAddAgain) =>
       handleAddAgainConfirmation(isOkToAddAgain)
