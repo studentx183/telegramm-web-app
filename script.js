@@ -266,7 +266,7 @@ const onPostClient = async (_data) => {
   const latitude = selectedLocation[0];
   const longitude = selectedLocation[1];
   const { query_id, hash } = DemoApp.initDataUnsafe;
-  const {
+  let {
     channel,
     category,
     city,
