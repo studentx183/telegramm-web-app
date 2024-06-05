@@ -43,7 +43,7 @@ const isValidForm = () => {
   const isLegalNameValid = validateLegalName();
   const isAddressValid = validateAddress();
   const isReferencePointValid = validateReferencePoint();
-  const isPinflOrInnValid = validatePinfl() || validateInn();
+  const isPinflOrInnValid = validatePinfl() && validateInn();
 
   if (!isSelectBoxesValid) {
     alert("Выберите все поля");
@@ -108,17 +108,20 @@ const validateInn = () => {
   const pinflInput = document.getElementById("pinfl-input");
   const errorTag = innInput.nextElementSibling;
   const pinflInputErrorTag = pinflInput.nextElementSibling;
-  const isValidPinfl = pinflInput.value.length === 18;
 
-  if (innInput.value.length < 11 && !isValidPinfl) {
+  const isValidPinfl = pinflInput.value.length === 18;
+  if (innInput.value.length === 0 && isValidPinfl) {
+    errorTag.textContent = null;
+    return true;
+  }
+
+  if (innInput.value.length < 11) {
     errorTag.textContent = "*Введите корректный ИНН";
     return false;
   }
-  if (!isValidPinfl) {
-    pinflInput.value = null;
-  }
+
+  pinflInput.value.length === 0 && (pinflInputErrorTag.textContent = null);
   errorTag.textContent = null;
-  pinflInputErrorTag.textContent = null;
   return true;
 };
 
@@ -127,17 +130,20 @@ const validatePinfl = () => {
   const innInput = document.getElementById("inn-input");
   const errorTag = pinflInput.nextElementSibling;
   const innInputErrorTag = innInput.nextElementSibling;
-  const isValidInn = innInput.value.length === 11;
 
-  if (pinflInput.value.length !== 18 && !isValidInn) {
+  const isValidInn = innInput.value.length === 11;
+  if (pinflInput.value.length === 0 && isValidInn) {
+    errorTag.textContent = null;
+    return true;
+  }
+
+  if (pinflInput.value.length !== 18) {
     errorTag.textContent = "*Введите корректный ПИНФЛ";
     return false;
   }
-  if (!isValidInn) {
-    innInput.value = null;
-  }
+
+  innInput.value.length === 0 && (innInputErrorTag.textContent = null);
   errorTag.textContent = null;
-  innInputErrorTag.textContent = null;
   return true;
 };
 
@@ -211,27 +217,6 @@ const validateInfoInputsOnInput = () => {
   document
     .getElementById("reference-input")
     .addEventListener("input", validateReferencePoint);
-};
-
-const deleteInvalidInnOrinflOnBlur = () => {
-  const innInput = document.getElementById("inn-input");
-  const pinflInput = document.getElementById("pinfl-input");
-
-  innInput.addEventListener("blur", () => {
-    const isValidInn = innInput.value.length === 11;
-    const isValidPinfl = pinflInput.value.length === 18;
-    if (!isValidInn && isValidPinfl) {
-      innInput.value = null;
-    }
-  });
-
-  pinflInput.addEventListener("blur", () => {
-    const isValidInn = innInput.value.length === 11;
-    const isValidPinfl = pinflInput.value.length === 18;
-    if (!isValidPinfl && isValidInn) {
-      pinflInput.value = null;
-    }
-  });
 };
 
 const validateAgentCodeOnInput = () => {
@@ -592,7 +577,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       mask: "0 000000 000 000 0",
     });
     validateInfoInputsOnInput();
-    deleteInvalidInnOrinflOnBlur();
   };
 
   // Create loader
