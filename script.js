@@ -436,7 +436,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
       </div>
       <div style="position: relative">
-        <label for="inn-input">ПИНФЛ</label>
+        <label for="pinfl-input">ПИНФЛ</label>
         <input type="text" name="pinfl" id="pinfl-input" class="text-input" placeholder="ПИНФЛ" />
         <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
       </div>
