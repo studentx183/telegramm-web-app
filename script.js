@@ -112,6 +112,7 @@ const validateInn = () => {
     errorTag.textContent = "*Введите корректный ИНН";
     return false;
   }
+  pinflInput.value = null;
   errorTag.textContent = null;
   pinflInputErrorTag.textContent = null;
   return true;
@@ -126,6 +127,7 @@ const validatePinfl = () => {
     errorTag.textContent = "*Введите корректный ПИНФЛ";
     return false;
   }
+  innInput.value = null;
   errorTag.textContent = null;
   innInputErrorTag.textContent = null;
   return true;
