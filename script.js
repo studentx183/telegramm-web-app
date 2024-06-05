@@ -108,11 +108,12 @@ const validateInn = () => {
   const pinflInput = document.getElementById("pinfl-input");
   const errorTag = innInput.nextElementSibling;
   const pinflInputErrorTag = pinflInput.nextElementSibling;
-  if (innInput.value.length < 11) {
+  const isValidPinfl = pinflInput.value.length === 18;
+
+  if (innInput.value.length < 11 && !isValidPinfl) {
     errorTag.textContent = "*Введите корректный ИНН";
     return false;
   }
-  const isValidPinfl = pinflInput.value.length === 18;
   if (!isValidPinfl) {
     pinflInput.value = null;
   }
@@ -126,11 +127,12 @@ const validatePinfl = () => {
   const innInput = document.getElementById("inn-input");
   const errorTag = pinflInput.nextElementSibling;
   const innInputErrorTag = innInput.nextElementSibling;
-  if (pinflInput.value.length !== 18) {
+  const isValidInn = innInput.value.length === 11;
+
+  if (pinflInput.value.length !== 18 && !isValidInn) {
     errorTag.textContent = "*Введите корректный ПИНФЛ";
     return false;
   }
-  const isValidInn = innInput.value.length === 11;
   if (!isValidInn) {
     innInput.value = null;
   }
@@ -209,6 +211,27 @@ const validateInfoInputsOnInput = () => {
   document
     .getElementById("reference-input")
     .addEventListener("input", validateReferencePoint);
+};
+
+const deleteInvalidInnOrinflOnBlur = () => {
+  const innInput = document.getElementById("inn-input");
+  const pinflInput = document.getElementById("pinfl-input");
+
+  innInput.addEventListener("blur", () => {
+    const isValidInn = innInput.value.length === 11;
+    const isValidPinfl = pinflInput.value.length === 18;
+    if (!isValidInn && isValidPinfl) {
+      innInput.value = null;
+    }
+  });
+
+  pinflInput.addEventListener("blur", () => {
+    const isValidInn = innInput.value.length === 11;
+    const isValidPinfl = pinflInput.value.length === 18;
+    if (!isValidPinfl && isValidInn) {
+      pinflInput.value = null;
+    }
+  });
 };
 
 const validateAgentCodeOnInput = () => {
@@ -565,8 +588,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       mask: "+{998} (00) 000-00-00",
     });
     IMask(document.getElementById("inn-input"), { mask: "000 000 000" });
-    IMask(document.getElementById("pinfl-input"), { mask: "0 000000 000 000 0" });
+    IMask(document.getElementById("pinfl-input"), {
+      mask: "0 000000 000 000 0",
+    });
     validateInfoInputsOnInput();
+    deleteInvalidInnOrinflOnBlur();
   };
 
   // Create loader
