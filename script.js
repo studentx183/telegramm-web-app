@@ -40,19 +40,21 @@ const isValidForm = () => {
   const isValidAgentCode = validateAgentCode();
   const isNameValid = validateName();
   const isPhoneValid = validatePhone();
-  const isInnValid = validateInn();
   const isLegalNameValid = validateLegalName();
   const isAddressValid = validateAddress();
   const isReferencePointValid = validateReferencePoint();
+  const isPinflOrInnValid = validatePinfl() || validateInn();
 
   if (!isSelectBoxesValid) {
     alert("Выберите все поля");
+    return false;
+  } else if (!isPinflOrInnValid) {
+    alert("Введите корректный ИНН или ПИНФЛ");
     return false;
   } else if (
     !isValidAgentCode ||
     !isNameValid ||
     !isPhoneValid ||
-    !isInnValid ||
     !isLegalNameValid ||
     !isAddressValid ||
     !isReferencePointValid
@@ -103,12 +105,37 @@ const validatePhone = () => {
 
 const validateInn = () => {
   const innInput = document.getElementById("inn-input");
+  const pinflInput = document.getElementById("pinfl-input");
   const errorTag = innInput.nextElementSibling;
+  const pinflInputErrorTag = pinflInput.nextElementSibling;
   if (innInput.value.length < 11) {
     errorTag.textContent = "*Введите корректный ИНН";
     return false;
   }
+  const isValidPinfl = pinflInput.value.length === 14;
+  if (!isValidPinfl) {
+    pinflInput.value = null;
+  }
   errorTag.textContent = null;
+  pinflInputErrorTag.textContent = null;
+  return true;
+};
+
+const validatePinfl = () => {
+  const pinflInput = document.getElementById("pinfl-input");
+  const innInput = document.getElementById("inn-input");
+  const errorTag = pinflInput.nextElementSibling;
+  const innInputErrorTag = innInput.nextElementSibling;
+  if (pinflInput.value.length !== 14) {
+    errorTag.textContent = "*Введите корректный ПИНФЛ";
+    return false;
+  }
+  const isValidInn = innInput.value.length === 11;
+  if (!isValidInn) {
+    innInput.value = null;
+  }
+  errorTag.textContent = null;
+  innInputErrorTag.textContent = null;
   return true;
 };
 
@@ -167,6 +194,9 @@ const validateReferencePoint = () => {
 const validateInfoInputsOnInput = () => {
   document.getElementById("inn-input").addEventListener("input", validateInn);
   document
+    .getElementById("pinfl-input")
+    .addEventListener("input", validatePinfl);
+  document
     .getElementById("phone-input")
     .addEventListener("input", validatePhone);
   document.getElementById("name-input").addEventListener("input", validateName);
@@ -215,7 +245,6 @@ const getParsedCoords = (coords) => {
 const getSelectedZoneId = () => {
   const urlParams = new URLSearchParams(window.location.search);
   const selectedZoneId = urlParams.get("zone_id");
-  console.log(selectedZoneId, "zone-id");
   return selectedZoneId;
 };
 
@@ -238,6 +267,7 @@ const onPostClient = async (_data) => {
     address,
     company_name,
     inn,
+    pinfl,
     name,
     navigate,
     phone,
@@ -248,6 +278,7 @@ const onPostClient = async (_data) => {
     address,
     company_name,
     inn,
+    pinfl,
     name,
     navigate,
     phone,
@@ -389,12 +420,16 @@ document.addEventListener("DOMContentLoaded", async () => {
       <div style="position: relative">
         <label for="phone-input">Телефон</label>
         <input type="tel" name="phone" required id="phone-input" class="text-input" placeholder="Телефон" />
-
         <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
       </div>
       <div style="position: relative">
         <label for="inn-input">Инн</label>
-        <input type="text" required name="inn" id="inn-input" class="text-input" placeholder="Инн" />
+        <input type="text" name="inn" id="inn-input" class="text-input" placeholder="Инн" />
+        <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
+      </div>
+      <div style="position: relative">
+        <label for="inn-input">ПИНФЛ</label>
+        <input type="text" name="pinfl" id="pinfl-input" class="text-input" placeholder="ПИНФЛ" />
         <small style="position: absolute; right: 0; bottom: -20px; color: red"></small>
       </div>
       <div style="position: relative">
@@ -564,7 +599,6 @@ document.addEventListener("DOMContentLoaded", async () => {
           );
         } else {
           alert("Ошибка при добавлении клиента");
-          resetForm();
         }
       }
     });
